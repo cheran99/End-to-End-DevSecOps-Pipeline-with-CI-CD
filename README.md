@@ -29,6 +29,7 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
    ```
    wsl --install
    ```
+4. <a href="https://cloud.google.com/sdk/docs/install"> Install Google Cloud CLI </a>
 
 ## Deployment Stages
 
@@ -62,7 +63,31 @@ Once you are in Visual Studio Code with this GitHub repo open, head over to the 
 wsl -d Ubuntu
 ```
 
-Ensure that you are in the directory for this GitHub repo in the WSL terminal. Once you are in this directory, change the directory to the `terraform` directory using the following command:
+Log in to Google Cloud CLI using the following command:
+```
+gcloud init
+```
+
+You will be asked to select the account you want to log in to, which is used for the GCP. Once you are logged in, select the Google Cloud project that was created earlier. Next, you will be prompted to configure the compute region and zone to a location of your choice. You can select your preferred location.
+
+Next, use `gcloud` CLI to set up your Application Default Credentials so that Terraform can authenticate to Google Cloud to create infrastructure. Use the following command:
+```
+gcloud auth application-default login
+```
+
+Next, go to the GCP portal in your web browser, then to "IAM and admin", and then to "Service accounts". Click "Create service account" and add the following information:
+- Name: terraform-deployer
+- Description: Used by Terraform to manage resources
+- Assign the following roles to this service account:
+  - Editor
+  - Viewer
+  - Artifact Registry Administrator
+  - Cloud Run Admin
+  - Compute Storage Admin
+
+Once this service account is created, go to the "Keys" tab for this service account and create a new key in JSON format. Save the key file somewhere safe and do not commit this to this GitHub repo.  
+
+Head over to the WSL terminal and ensure that you are in the directory for this GitHub repo in this terminal. Once you are in this directory, change the directory to the `terraform` directory using the following command:
 ```
 cd terraform
 ```
@@ -72,7 +97,16 @@ Once you are in this directory, initialise Terraform using the following command
 terraform init
 ```
 
-Once Terraform is initialised, open the `main.tf` file in the GitHub repo. 
+Use the JSON key that was generated earlier for Terraform using the following command:
+```
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/gcp-key.json"
+```
+
+Once Terraform is initialised, open the `main.tf` file in the GitHub repo. Provision the following resources:
+- Artifact Registry
+- Cloud Run
+
+
 
 
 
@@ -84,3 +118,7 @@ Once Terraform is initialised, open the `main.tf` file in the GitHub repo.
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
 - https://www.microsoft.com/en-gb/security/business/security-101/what-is-devsecops#:~:text=DevSecOps%2C%20which%20stands%20for%20development,releasing%20code%20with%20security%20vulnerabilities.
+- https://cloud.google.com/compute/docs/regions-zones#choosing_a_region_and_zone
+- https://jozimarback.medium.com/using-github-actions-with-terraform-on-gcp-d473a37ddbd6
+- https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-build
+- https://registry.terraform.io/providers/hashicorp/google/latest/docs
