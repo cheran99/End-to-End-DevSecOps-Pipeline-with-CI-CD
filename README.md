@@ -241,3 +241,6 @@ Now that the resources have been provisioned, the next steps will be to build an
 - https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-build
 - https://registry.terraform.io/providers/hashicorp/google/latest/docs
 - https://cloud.google.com/run/docs/authenticating/public#terraform
+- https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-variables
+- https://spacelift.io/blog/how-to-use-terraform-variables
+- https://www.geeksforgeeks.org/how-to-use-a-dockerignore-file/
