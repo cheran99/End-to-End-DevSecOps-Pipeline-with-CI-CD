@@ -97,12 +97,21 @@ Once you are in this directory, initialise Terraform using the following command
 terraform init
 ```
 
-Use the JSON key that was generated earlier for Terraform using the following command:
+Copy the JSON key file that was generated earlier into the WSL using the following command:
 ```
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/gcp-key.json"
+cp /mnt/path/to/gcp-key.json ~/gcp-key.json
+```
+Replace the `gcp-key` with the name of your JSON key file.
+
+Use this key for Terraform and activate it using the following commands:
+```
+export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
+gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 ```
 
-Once Terraform is initialised, open the `main.tf` file in the GitHub repo. Provision the following resources:
+This will allow Terraform to authenticate to GCP using this key.
+
+Once Terraform is initialised and authenticated to GCP, open the `main.tf` file in the GitHub repo. Provision the following resources:
 - Artifact Registry
 - Cloud Run
 
