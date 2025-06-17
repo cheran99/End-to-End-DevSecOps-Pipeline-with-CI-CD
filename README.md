@@ -106,6 +106,115 @@ Once Terraform is initialised, open the `main.tf` file in the GitHub repo. Provi
 - Artifact Registry
 - Cloud Run
 
+The `main.tf` file should look something like this:
+```
+terraform {
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+      version = "6.39.0"
+    }
+  }
+}
+
+
+provider "google" {
+  project     = <Google Project ID>
+  region      = var.region
+  zone        = var.zone
+}
+
+resource "google_artifact_registry_repository" "docker_repo" {
+  location      = var.region
+  repository_id = "app-repo"
+  description   = "Docker repo for CI/CD"
+  format        = "DOCKER"
+}
+
+resource "google_cloud_run_v2_service" "app" {
+  name     = "devsecops-app"
+  location = var.region
+  deletion_protection = false
+  ingress = "INGRESS_TRAFFIC_ALL"
+
+  template {
+    containers {
+      image = "us-docker.pkg.dev/cloudrun/container/hello"
+    }
+  }
+}
+```
+
+The `variables.tf` file should look something like this:
+```
+variable "region" {
+    description = "GCP region"
+    type        = string
+    default     = "europe-west2"
+}
+
+variable "zone" {
+    description = "GCP zone"
+    type        = string
+    default     = "europe-west2-a"
+}
+```
+
+And the `outputs.tf` file should look something like this:
+```
+output "cloud_run_url" {
+  description = "URL of deployed Cloud Run app"
+  value       = google_cloud_run_v2_service.app.uri
+}
+```
+
+Once the resources have been defined in Terraform, you can create an execution plan and apply the proposed changes using the following command:
+```
+terraform plan
+terraform apply
+```
+
+This will create a link for the Cloud Run Service:
+
+![image](https://github.com/user-attachments/assets/3162b5d4-40ef-4b4b-b4c9-07d40e31882b)
+
+When you access this link, it gives you an error message:
+
+![image](https://github.com/user-attachments/assets/1e3c674c-862a-4cea-bcde-10c05f55d7f6)
+
+This is because the cloud run is not accessible to the public yet. To enable public access, the Cloud Run Service IAM member needs to be provisioned using Terraform. Add the following to the `main.tf` file:
+```
+resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
+  project = google_cloud_run_v2_service.app.project
+  location = google_cloud_run_v2_service.app.location
+  name = google_cloud_run_v2_service.app.name
+  role = "roles/run.invoker"
+  member = "allUsers"
+}
+```
+
+Then run the following commands:
+```
+terraform plan
+terraform apply
+```
+
+This will grant public access to the Cloud Run Service URL. To verify this, visit the link again:
+
+![image](https://github.com/user-attachments/assets/a4da628e-e5ca-4466-a500-9ab32efb0825)
+
+As shown above, the public access to the Cloud Run Service is working, although further deployments to the service will be need to be made to update this page. 
+
+To verify that the Cloud Run Service resource has been successfully provisioned, on the GCP portal, go to the Cloud Run page, and you will see the created service as defined by Terraform:
+
+![image](https://github.com/user-attachments/assets/85305517-a72b-469f-8cbe-f2a404b7b8e6)
+
+For the Artifact Registry Repository resource, go to Artifact Registry, and you will see the repository that was provisioned with Terraform:
+
+![image](https://github.com/user-attachments/assets/da8caec7-1623-498a-be72-df8277f022b4)
+
+Now that the resources have been provisioned, the next steps will be to build an application, containerise it with Docker, push the Docker image to Artifact Registry, and deploy it to Cloud Run. 
+
 
 
 
@@ -122,3 +231,4 @@ Once Terraform is initialised, open the `main.tf` file in the GitHub repo. Provi
 - https://jozimarback.medium.com/using-github-actions-with-terraform-on-gcp-d473a37ddbd6
 - https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-build
 - https://registry.terraform.io/providers/hashicorp/google/latest/docs
+- https://cloud.google.com/run/docs/authenticating/public#terraform
