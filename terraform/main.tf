@@ -41,3 +41,25 @@ resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
   role = "roles/run.invoker"
   member = "allUsers"
 }
+
+resource "google_sql_database_instance" "mysql_devsecops" {
+  name             = "mysql-devsecops"
+  region           = var.region
+  database_version = "MYSQL_8_0"
+  settings {
+    tier           = "db-g1-small" 
+  }
+
+  deletion_protection  = true
+}
+
+resource "google_sql_database" "devsecops_db" {
+  name     = "devsecopsdb"
+  instance = google_sql_database_instance.mysql_devsecops.name
+}
+
+resource "google_sql_user" "users" {
+  name     = var.mysql_username
+  instance = google_sql_database_instance.mysql_devsecops.name
+  password_wo = var.mysql_password
+}
