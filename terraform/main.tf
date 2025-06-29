@@ -54,12 +54,12 @@ resource "google_sql_database_instance" "mysql_devsecops" {
 }
 
 resource "google_sql_database" "devsecops_db" {
-  name     = "devsecopsdb"
-  instance = google_sql_database_instance.mysql_devsecops.name
+  name             = "devsecopsdb"
+  instance         = google_sql_database_instance.mysql_devsecops.name
 }
 
 resource "google_sql_user" "users" {
-  name     = var.mysql_username
-  instance = google_sql_database_instance.mysql_devsecops.name
-  password_wo = var.mysql_password
+  name             = var.mysql_username
+  instance         = google_sql_database_instance.mysql_devsecops.name
+  password_wo      = var.mysql_password
 }
