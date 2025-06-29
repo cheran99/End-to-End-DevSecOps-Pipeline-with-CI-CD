@@ -222,7 +222,82 @@ For the Artifact Registry Repository resource, go to Artifact Registry, and you 
 
 ![image](https://github.com/user-attachments/assets/da8caec7-1623-498a-be72-df8277f022b4)
 
-Now that the resources have been provisioned, the next steps will be to build an application, containerise it with Docker, push the Docker image to Artifact Registry, and deploy it to Cloud Run. 
+Now that the resources have been provisioned, the next steps will be to provision a Cloud SQL instance and database, build an application, containerise it with Docker, push the Docker image to Artifact Registry, and deploy it to Cloud Run. 
+
+### Provisioning Cloud SQL With Terraform
+
+Before building an application, the MySQL instance and database need to be implemented so that the Flask application can connect to them. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
+```
+terraform init
+```
+
+Next, authenticate Terraform to GCP using the following command:
+```
+export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
+gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+```
+Replace the `gcp-key` with the name of your JSON key file.
+
+Open the `main.tf` file in Visual Studio Code and add the following resources:
+```
+resource "google_sql_database_instance" "mysql_devsecops" {
+  name             = "mysql-devsecops"
+  region           = var.region
+  database_version = "MYSQL_8_0"
+  settings {
+    tier           = "db-g1-small" 
+  }
+
+  deletion_protection  = true
+}
+
+resource "google_sql_database" "devsecops_db" {
+  name     = "devsecopsdb"
+  instance = google_sql_database_instance.mysql_devsecops.name
+}
+
+resource "google_sql_user" "users" {
+  name     = var.mysql_username
+  instance = google_sql_database_instance.mysql_devsecops.name
+  password_wo = var.mysql_password
+}
+
+```
+
+Terraform will provision the MySQL instance, its database, and credentials onto the Google Cloud Platform. In the `variables.tf` file, add the following variables, such as the username and password for the MySQL instance, due to their sensitivity:
+```
+variable "mysql_username" {
+    description = "MySQL username"
+    type        = string
+    default     = "admin"
+}
+
+variable "mysql_password" {
+    description = "MySQL password"
+    type        = string
+    sensitive   = true
+}
+```
+
+By marking the password as sensitive, this will prevent Terraform from accidentally displaying it. On the GCP portal, go to "APIs and Services" and enable the "Cloud SQL Admin API".
+
+Next, create an execution plan and then apply the changes using the following commands:
+```
+terraform plan
+terraform apply
+```
+
+When running this command, you will be prompted to enter the MySQL password. This is mainly because `password_wo` is used as a value under the `google_sql_user` resource instead of `password` because it allows the user to securely pass sensitive data to configure the resources without Terraform storing the value. 
+
+To verify that the resources have been created, on the GCP portal, go to Cloud SQL. You will see that the MySQL instance has been created:
+
+![image](https://github.com/user-attachments/assets/f9e337ee-64d3-4a9e-8139-3b8e0416fe93)
+
+Go to this instance and you can see that the database and user credentials have successfully been created.
+
+![image](https://github.com/user-attachments/assets/21ee7cec-4364-40bc-bb9d-3b4bade0deee)
+
+![image](https://github.com/user-attachments/assets/9848fbe9-a7de-455e-8435-8d1affbcdc16)
 
 
 
@@ -244,3 +319,8 @@ Now that the resources have been provisioned, the next steps will be to build an
 - https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-variables
 - https://spacelift.io/blog/how-to-use-terraform-variables
 - https://www.geeksforgeeks.org/how-to-use-a-dockerignore-file/
+- https://cloud.google.com/sql/docs/mysql/create-instance
+- https://cloud.google.com/sql/pricing?hl=en#section-1
+- https://cloud.google.com/sql/docs/mysql/machine-series-overview
+- https://developer.hashicorp.com/terraform/language/resources/ephemeral/write-only
+- https://medium.com/terraform-using-google-cloud-platform/terraform-for-gcp-how-to-create-cloud-sql-0a558840914c
