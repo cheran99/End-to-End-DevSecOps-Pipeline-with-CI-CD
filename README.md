@@ -367,3 +367,4 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://cloud.google.com/sql/docs/mysql/connect-run
 - https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/README.md
 - https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9
+- https://medium.com/@terwaljoop/just-a-devsecops-project-to-showcase-your-skills-and-knowledge-on-your-cv-and-github-60610005b097
