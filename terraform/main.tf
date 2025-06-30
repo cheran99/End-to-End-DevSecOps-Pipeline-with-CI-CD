@@ -89,9 +89,10 @@ resource "google_composer_environment" "devsecops_env" {
     software_config {
       image_version = "composer-3-airflow-2.10.5-build.7"
       env_variables = {
-        DB_USER     = google_sql_user.users.name
-        DB_PASS     = google_sql_user.users.password
-        DB_NAME     = google_sql_database.devsecops_db.name
+        INSTANCE_CONNECTION_NAME = "devsecops-pipeline-463112:europe-west2:mysql-devsecops"
+        DB_USER                  = google_sql_user.users.name
+        DB_PASS                  = google_sql_user.users.password
+        DB_NAME                  = google_sql_database.devsecops_db.name
       }
     }
 
