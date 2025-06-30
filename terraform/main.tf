@@ -98,6 +98,5 @@ resource "google_composer_environment" "devsecops_env" {
     node_config {
       service_account = google_service_account.composer_sa.email
     }
-
   }
 }
