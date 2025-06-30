@@ -15,9 +15,3 @@ variable "mysql_username" {
     type        = string
     default     = "admin"
 }
-
-variable "mysql_password" {
-    description = "MySQL password"
-    type        = string
-    sensitive   = true
-}

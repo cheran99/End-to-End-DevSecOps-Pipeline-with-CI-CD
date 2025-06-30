@@ -58,8 +58,46 @@ resource "google_sql_database" "devsecops_db" {
   instance         = google_sql_database_instance.mysql_devsecops.name
 }
 
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "google_sql_user" "users" {
   name             = var.mysql_username
   instance         = google_sql_database_instance.mysql_devsecops.name
-  password_wo      = var.mysql_password
+  password         = random_password.password.result
+}
+
+resource "google_service_account" "composer_sa" {
+  account_id   = "composer-sa"
+  display_name = "Cloud Composer Service Account"
+}
+
+resource "google_project_iam_member" "composer_sa" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.composer_sa.email)
+  role     = "roles/composer.worker"
+}
+
+resource "google_composer_environment" "devsecops_env" {
+  name = "devsecops-env"
+
+  config {
+
+    software_config {
+      image_version = "composer-3-airflow-2.10.5-build.7"
+      env_variables = {
+        DB_USER     = google_sql_user.users.name
+        DB_PASS     = google_sql_user.users.password
+        DB_NAME     = google_sql_database.devsecops_db.name
+      }
+    }
+
+    node_config {
+      service_account = google_service_account.composer_sa.email
+    }
+
+  }
 }
