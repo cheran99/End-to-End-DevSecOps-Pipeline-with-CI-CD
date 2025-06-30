@@ -224,9 +224,9 @@ For the Artifact Registry Repository resource, go to Artifact Registry, and you 
 
 Now that the resources have been provisioned, the next steps will be to provision a Cloud SQL instance and database, build an application, containerise it with Docker, push the Docker image to Artifact Registry, and deploy it to Cloud Run. 
 
-### Provisioning Cloud SQL With Terraform
+### Provisioning Cloud SQL and Cloud Composer Environment With Terraform
 
-Before building an application, the MySQL instance and database need to be implemented so that the Flask application can connect to them. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
+Before building an application, the MySQL instance, database, and Cloud Composer Environment need to be implemented so that the Flask application can connect to them. The Cloud Composer Environment is where the environmental variables such as instance connection name, username, password, and database name will be stored so that when the Flask application runs, it can use these variables to connect to the MySQL instance. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
 ```
 terraform init
 ```
@@ -252,42 +252,69 @@ resource "google_sql_database_instance" "mysql_devsecops" {
 }
 
 resource "google_sql_database" "devsecops_db" {
-  name     = "devsecopsdb"
-  instance = google_sql_database_instance.mysql_devsecops.name
+  name             = "devsecopsdb"
+  instance         = google_sql_database_instance.mysql_devsecops.name
+}
+
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 resource "google_sql_user" "users" {
-  name     = var.mysql_username
-  instance = google_sql_database_instance.mysql_devsecops.name
-  password_wo = var.mysql_password
+  name             = var.mysql_username
+  instance         = google_sql_database_instance.mysql_devsecops.name
+  password         = random_password.password.result
 }
 
+resource "google_service_account" "composer_sa" {
+  account_id   = "composer-sa"
+  display_name = "Cloud Composer Service Account"
+}
+
+resource "google_project_iam_member" "composer_sa" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.composer_sa.email)
+  role     = "roles/composer.worker"
+}
+
+resource "google_composer_environment" "devsecops_env" {
+  name = "devsecops-env"
+
+  config {
+
+    software_config {
+      image_version = "composer-3-airflow-2.10.5-build.7"
+      env_variables = {
+        INSTANCE_CONNECTION_NAME = "devsecops-pipeline-463112:europe-west2:mysql-devsecops"
+        DB_USER                  = google_sql_user.users.name
+        DB_PASS                  = google_sql_user.users.password
+        DB_NAME                  = google_sql_database.devsecops_db.name
+      }
+    }
+
+    node_config {
+      service_account = google_service_account.composer_sa.email
+    }
+  }
+}
 ```
 
-Terraform will provision the MySQL instance, its database, and credentials onto the Google Cloud Platform. In the `variables.tf` file, add the following variables, such as the username and password for the MySQL instance, due to their sensitivity:
+Terraform will provision the MySQL instance, its database, credentials, and Cloud Composer Environment onto the Google Cloud Platform. In the `variables.tf` file, add the MySQL username as the variable:
 ```
 variable "mysql_username" {
     description = "MySQL username"
     type        = string
     default     = "admin"
 }
-
-variable "mysql_password" {
-    description = "MySQL password"
-    type        = string
-    sensitive   = true
-}
 ```
-
-By marking the password as sensitive, this will prevent Terraform from accidentally displaying it. On the GCP portal, go to "APIs and Services" and enable the "Cloud SQL Admin API".
 
 Next, create an execution plan and then apply the changes using the following commands:
 ```
 terraform plan
 terraform apply
 ```
-
-When running this command, you will be prompted to enter the MySQL password. This is mainly because `password_wo` is used as a value under the `google_sql_user` resource instead of `password` because it allows the user to securely pass sensitive data to configure the resources without Terraform storing the value. 
 
 To verify that the resources have been created, on the GCP portal, go to Cloud SQL. You will see that the MySQL instance has been created:
 
@@ -300,8 +327,17 @@ Go to this instance and you can see that the database and user credentials have 
 ![image](https://github.com/user-attachments/assets/9848fbe9-a7de-455e-8435-8d1affbcdc16)
 
 
+Go to Composer, and you can see that the environment has been created:
 
+![image](https://github.com/user-attachments/assets/1cb3835d-8f4f-485c-a052-7e8b266f6961)
 
+Go to this environment, then to "Environment variables", and you can see that the variables for the instance connection name, username, password, and database name have successfully been stored:
+
+![image](https://github.com/user-attachments/assets/c94070ab-bff9-4c4c-b23e-da524c6f58b7)
+
+Next, go to Cloud Run and then to the Cloud Run service that was created earlier. Go to "Edit and deploy new revision" and scroll down to "Cloud SQL connections". Click "Add connection" and select the instance connection name for the MySQL instance that was created earlier, and then select "Deploy":
+
+![image](https://github.com/user-attachments/assets/aa6161b1-357c-4fae-bd77-50cfd05cda32)
 
 
 
