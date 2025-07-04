@@ -70,34 +70,61 @@ resource "google_sql_user" "users" {
   password         = random_password.password.result
 }
 
-resource "google_service_account" "composer_sa" {
-  account_id   = "composer-sa"
-  display_name = "Cloud Composer Service Account"
+resource "google_service_account" "secretmanager_sa" {
+  account_id   = "secretmanager-sa"
+  display_name = "Secret Manager Service Account"
 }
 
-resource "google_project_iam_member" "composer_sa" {
+resource "google_project_iam_member" "secretmanager_sa" {
   project  = "devsecops-pipeline-463112"
-  member   = format("serviceAccount:%s", google_service_account.composer_sa.email)
-  role     = "roles/composer.worker"
+  member   = format("serviceAccount:%s", google_service_account.secretmanager_sa.email)
+  role     = "roles/secretmanager.admin"
 }
 
-resource "google_composer_environment" "devsecops_env" {
-  name = "devsecops-env"
-
-  config {
-
-    software_config {
-      image_version = "composer-3-airflow-2.10.5-build.7"
-      env_variables = {
-        INSTANCE_CONNECTION_NAME = "devsecops-pipeline-463112:europe-west2:mysql-devsecops"
-        DB_USER                  = google_sql_user.users.name
-        DB_PASS                  = google_sql_user.users.password
-        DB_NAME                  = google_sql_database.devsecops_db.name
-      }
-    }
-
-    node_config {
-      service_account = google_service_account.composer_sa.email
-    }
+resource "google_secret_manager_secret" "instance_conn" {
+  secret_id = "instance-connection-name"
+  replication {
+    auto {}
   }
+}
+
+resource "google_secret_manager_secret_version" "instance_conn_version" {
+  secret = google_secret_manager_secret.instance_conn.id
+  secret_data = "devsecops-pipeline-463112:europe-west2:mysql-devsecops"
+}
+
+resource "google_secret_manager_secret" "db_user" {
+  secret_id = "db-user"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db_user_version" {
+  secret = google_secret_manager_secret.db_user.id
+  secret_data = var.mysql_username
+}
+
+resource "google_secret_manager_secret" "db_pass" {
+  secret_id = "db-pass"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db_pass_version" {
+  secret = google_secret_manager_secret.db_pass.id
+  secret_data = google_sql_user.users.password
+}
+
+resource "google_secret_manager_secret" "db_name" {
+  secret_id = "db-name"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db_name_version" {
+  secret = google_secret_manager_secret.db_name.id
+  secret_data = google_sql_database.devsecops_db.name
 }
