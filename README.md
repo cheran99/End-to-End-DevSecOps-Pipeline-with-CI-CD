@@ -224,9 +224,9 @@ For the Artifact Registry Repository resource, go to Artifact Registry, and you 
 
 Now that the resources have been provisioned, the next steps will be to provision a Cloud SQL instance and database, build an application, containerise it with Docker, push the Docker image to Artifact Registry, and deploy it to Cloud Run. 
 
-### Provisioning Cloud SQL and Cloud Composer Environment With Terraform
+### Provisioning Cloud SQL and Secret Manager With Terraform
 
-Before building an application, the MySQL instance, database, and Cloud Composer Environment need to be implemented so that the Flask application can connect to them. The Cloud Composer Environment is where the environmental variables such as instance connection name, username, password, and database name will be stored so that when the Flask application runs, it can use these variables to connect to the MySQL instance. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
+Before building an application, the MySQL instance, database, and Secret Manager need to be implemented so that the Flask application can connect to them. The Secret Manager is where the environmental variables such as instance connection name, username, password, and database name will be safely and securely stored so that when the Flask application runs, it can use these variables to connect to the MySQL instance. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
 ```
 terraform init
 ```
@@ -268,40 +268,70 @@ resource "google_sql_user" "users" {
   password         = random_password.password.result
 }
 
-resource "google_service_account" "composer_sa" {
-  account_id   = "composer-sa"
-  display_name = "Cloud Composer Service Account"
+resource "google_service_account" "secretmanager_sa" {
+  account_id   = "secretmanager-sa"
+  display_name = "Secret Manager Service Account"
 }
 
-resource "google_project_iam_member" "composer_sa" {
+resource "google_project_iam_member" "secretmanager_sa" {
   project  = "devsecops-pipeline-463112"
-  member   = format("serviceAccount:%s", google_service_account.composer_sa.email)
-  role     = "roles/composer.worker"
+  member   = format("serviceAccount:%s", google_service_account.secretmanager_sa.email)
+  role     = "roles/secretmanager.admin"
 }
 
-resource "google_composer_environment" "devsecops_env" {
-  name = "devsecops-env"
-
-  config {
-
-    software_config {
-      image_version = "composer-3-airflow-2.10.5-build.7"
-      env_variables = {
-        INSTANCE_CONNECTION_NAME = "devsecops-pipeline-463112:europe-west2:mysql-devsecops"
-        DB_USER                  = google_sql_user.users.name
-        DB_PASS                  = google_sql_user.users.password
-        DB_NAME                  = google_sql_database.devsecops_db.name
-      }
-    }
-
-    node_config {
-      service_account = google_service_account.composer_sa.email
-    }
+resource "google_secret_manager_secret" "instance_conn" {
+  secret_id = "instance-connection-name"
+  replication {
+    auto {}
   }
+}
+
+resource "google_secret_manager_secret_version" "instance_conn_version" {
+  secret = google_secret_manager_secret.instance_conn.id
+  secret_data = "devsecops-pipeline-463112:europe-west2:mysql-devsecops"
+}
+
+resource "google_secret_manager_secret" "db_user" {
+  secret_id = "db-user"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db_user_version" {
+  secret = google_secret_manager_secret.db_user.id
+  secret_data = var.mysql_username
+}
+
+resource "google_secret_manager_secret" "db_pass" {
+  secret_id = "db-pass"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db_pass_version" {
+  secret = google_secret_manager_secret.db_pass.id
+  secret_data = google_sql_user.users.password
+}
+
+resource "google_secret_manager_secret" "db_name" {
+  secret_id = "db-name"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db_name_version" {
+  secret = google_secret_manager_secret.db_name.id
+  secret_data = google_sql_database.devsecops_db.name
 }
 ```
 
-Terraform will provision the MySQL instance, its database, credentials, and Cloud Composer Environment onto the Google Cloud Platform. In the `variables.tf` file, add the MySQL username as the variable:
+Terraform will provision the MySQL instance, its database, credentials, and Secret Manager and their secret versions, on the Google Cloud Platform. The `google_secret_manager_secret_version` resource blocks are where you store the contents of each secret, such as the MySQL credentials, connection name, and database name under `secret_data`. When assigning the value for each secret, always use dynamic values, for example `google_sql_user.users.password`, or Terraform variables instead of hardcoded values to ensure the security of the sensitive contents and to allow scalability, as the values may be subject to change. 
+
+
+In the `variables.tf` file, add the MySQL username as the variable:
 ```
 variable "mysql_username" {
     description = "MySQL username"
@@ -327,13 +357,12 @@ Go to this instance and you can see that the database and user credentials have 
 ![image](https://github.com/user-attachments/assets/9848fbe9-a7de-455e-8435-8d1affbcdc16)
 
 
-Go to Composer, and you can see that the environment has been created:
+Go to Secret Manager. You can see that the secrets have successfully been created by Terraform:
 
-![image](https://github.com/user-attachments/assets/1cb3835d-8f4f-485c-a052-7e8b266f6961)
+![image](https://github.com/user-attachments/assets/82beee44-3a79-49a1-a276-3f45131a00a1)
 
-Go to this environment, then to "Environment variables", and you can see that the variables for the instance connection name, username, password, and database name have successfully been stored:
+If you want to view the secret value, such as the database password, click the secret to which the password is assigned to. Select "Actions" for the latest secret version and click "View secret value". This will show you the secret value which in this case is the database password.
 
-![image](https://github.com/user-attachments/assets/c94070ab-bff9-4c4c-b23e-da524c6f58b7)
 
 Next, go to Cloud Run and then to the Cloud Run service that was created earlier. Go to "Edit and deploy new revision" and scroll down to "Cloud SQL connections". Click "Add connection" and select the instance connection name for the MySQL instance that was created earlier, and then select "Deploy":
 
@@ -368,3 +397,4 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/README.md
 - https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9
 - https://medium.com/@terwaljoop/just-a-devsecops-project-to-showcase-your-skills-and-knowledge-on-your-cv-and-github-60610005b097
+- https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#gcloud
