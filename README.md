@@ -44,6 +44,9 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
   - Cloud Resource Manager
   - Identity and Access Management (IAM) API
   - Compute Engine API
+  - Cloud SQL API
+  - Cloud SQL Admin API
+  - Secret Manager API
 
 ### Clone The GitHub Repository
 
