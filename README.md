@@ -401,3 +401,5 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9
 - https://medium.com/@terwaljoop/just-a-devsecops-project-to-showcase-your-skills-and-knowledge-on-your-cv-and-github-60610005b097
 - https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#gcloud
+- https://cloud.google.com/secret-manager/docs/reference/libraries#client-libraries-install-python
+- https://www.digitalocean.com/community/tutorials/how-to-use-flask-sqlalchemy-to-interact-with-databases-in-a-flask-application
