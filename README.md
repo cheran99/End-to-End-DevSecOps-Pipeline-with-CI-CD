@@ -405,3 +405,4 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://www.digitalocean.com/community/tutorials/how-to-use-flask-sqlalchemy-to-interact-with-databases-in-a-flask-application
 - https://cloud.google.com/secret-manager/docs/view-secret-version
 - https://cloud.google.com/secret-manager/docs/access-secret-version
+- https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords
