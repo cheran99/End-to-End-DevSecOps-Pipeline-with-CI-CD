@@ -403,3 +403,5 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#gcloud
 - https://cloud.google.com/secret-manager/docs/reference/libraries#client-libraries-install-python
 - https://www.digitalocean.com/community/tutorials/how-to-use-flask-sqlalchemy-to-interact-with-databases-in-a-flask-application
+- https://cloud.google.com/secret-manager/docs/view-secret-version
+- https://cloud.google.com/secret-manager/docs/access-secret-version
