@@ -1,24 +1,50 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 from google.cloud import secretmanager
+from google.cloud.sql.connector import Connector, IPTypes
+import pymysql
+import sqlalchemy
 import os
 
 app = Flask(__name__)
 
 project_id = "devsecops-pipeline-463112"
 
-def get_secret(secret_id: str):
+def access_secret_version(secret_id: str):
+    from google.cloud import secretmanager
     client = secretmanager.SecretManagerServiceClient()
     name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
     response = client.access_secret_version(request={"name": name})
     payload = response.payload.data.decode("UTF-8")
     return payload
 
-user = get_secret("db-user")
-password = get_secret("db-pass")
-database = get_secret("db-name")
-host = get_secret("instance-connection-name")
-port = 3306
+def get_db_connection() -> sqlalchemy.engine.base.Engine:
+    user = access_secret_version("db-user")
+    password = access_secret_version("db-pass")
+    database = access_secret_version("db-name")
+    instance_connection_name = access_secret_version("instance-connection-name")
+    port = 3306
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{user}:{password}@{host}:{port}/{database}'
+    ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC 
+    connector = Connector(ip_type=ip_type, refresh_strategy="LAZY")
+
+    def getconn() -> pymysql.connections.Connection:
+        conn: pymysql.connections.Connection = connector.connect(
+            user=user,
+            password=password,
+            host=instance_connection_name,
+            port=port,
+            db=database
+        )
+        return conn
+
+    pool = sqlalchemy.create_engine(
+        sqlalchemy.engine.url.URL.create(
+            "mysql+pymysql://",
+            creator=getconn,
+        )
+    )
+    return pool
+
+
+
 
