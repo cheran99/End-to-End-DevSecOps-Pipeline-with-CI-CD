@@ -406,3 +406,9 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://cloud.google.com/secret-manager/docs/view-secret-version
 - https://cloud.google.com/secret-manager/docs/access-secret-version
 - https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords
+- https://pypi.org/project/cloud-sql-python-connector/
+- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/app.py
+- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/connect_connector.py
+- https://medium.com/@pythoncodelab/building-a-to-do-list-app-in-python-a-step-by-step-guide-ce34b9ea141a
+- https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords
+- https://www.geeksforgeeks.org/python/todo-list-app-using-flask-python/
