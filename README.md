@@ -412,3 +412,8 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://medium.com/@pythoncodelab/building-a-to-do-list-app-in-python-a-step-by-step-guide-ce34b9ea141a
 - https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords
 - https://www.geeksforgeeks.org/python/todo-list-app-using-flask-python/
+- https://colab.research.google.com/github/GoogleCloudPlatform/cloud-sql-python-connector/blob/main/samples/notebooks/postgres_python_connector.ipynb#scrollTo=yjAPpIDdRfu2
+- https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9
+- https://stackoverflow.com/questions/73493052/how-to-connect-to-cloud-sql-using-python
+- https://sibabalwesinyaniso.medium.com/connecting-to-a-database-and-creating-tables-using-sqlalchemy-core-52cb79e51ca4
+- https://www.w3schools.com/sql/sql_update.asp
