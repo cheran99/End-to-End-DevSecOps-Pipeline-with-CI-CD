@@ -81,7 +81,7 @@ def add():
             conn.execute(query, values)
             conn.commit()
 
-        return redirect('index.html')
+        return redirect(url_for('index'))
 
 @app.route('/complete/<id>')
 def complete(id):
@@ -89,4 +89,4 @@ def complete(id):
         todo = conn.execute(("UPDATE todos").where(id=int(id)).values(complete = True)) #todos.query.filter_by(id=int(id)).first()
         conn.commit()
 
-        return redirect('index.html')
+        return redirect(url_for('index'))
