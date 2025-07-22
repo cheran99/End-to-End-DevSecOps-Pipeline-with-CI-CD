@@ -3,6 +3,7 @@ from google.cloud import secretmanager
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 import sqlalchemy
+import create_engine, MetaData, Table, Column, Integer, String, Float
 import os
 
 app = Flask(__name__)
@@ -52,25 +53,25 @@ def get_db_connection() -> sqlalchemy.engine.base.Engine:
 engine = get_db_connection () 
 metadata = sqlalchemy.MetaData()
     
-todo = Table(
-    "todo", metadata,
+todos = Table(
+    "todos", metadata,
     Column("id", Integer, primary_key=True),
-    Column("text", String(200))
-    Column("complete", Boolean)
+    Column("text", String(200)),
+    Column("complete", Boolean),
 )
 
 metadata.create_all(engine)
 
 @app.route('/')
 def index():
-    incomplete = todo.query.filter_by(complete=False).all()
-    complete = todo.query.filter_by(complete=True).all()
+    incomplete = todos.query.filter_by(complete=False).all()
+    complete = todos.query.filter_by(complete=True).all()
 
     return render_template('index.html', incomplete=incomplete, complete=complete)
 
 @app.route('/add', methods=['POST'])
 def add():
-    todo = Todo(text=request.form['todoitem'], complete=False)
+    todo = todos(text=request.form['todoitem'], complete=False)
     db.session.add(todo)
     db.session.commit()
 
@@ -79,7 +80,7 @@ def add():
 @app.route('/complete/<id>')
 def complete(id):
 
-    todo = Todo.query.filter_by(id=int(id)).first()
+    todo = todos.query.filter_by(id=int(id)).first()
     todo.complete = True
     db.session.commit()
 
