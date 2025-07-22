@@ -49,29 +49,22 @@ def get_db_connection() -> sqlalchemy.engine.base.Engine:
     )
     return pool
 
-def migrate_db(db: sqlalchemy.engine.base.Engine) -> None:
-    with db.connect() as conn:
-        conn.execute(
-            sqlalchemy.text(
-                "CREATE TABLE IF NOT EXISTS votes "
-                "( vote_id SERIAL NOT NULL, time_cast timestamp NOT NULL, "
-                "candidate VARCHAR(6) NOT NULL, PRIMARY KEY (vote_id) );"
-            )
-        )
-        conn.commit()
+engine = get_db_connection () 
+metadata = sqlalchemy.MetaData()
+    
+todo = Table(
+    "todo", metadata,
+    Column("id", Integer, primary_key=True),
+    Column("text", String(200))
+    Column("complete", Boolean)
+)
 
-class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(200))
-    complete = db.Column(db.Boolean)
-
-    def __repr__(self):
-        return self.text
+metadata.create_all(engine)
 
 @app.route('/')
 def index():
-    incomplete = Todo.query.filter_by(complete=False).all()
-    complete = Todo.query.filter_by(complete=True).all()
+    incomplete = todo.query.filter_by(complete=False).all()
+    complete = todo.query.filter_by(complete=True).all()
 
     return render_template('index.html', incomplete=incomplete, complete=complete)
 
