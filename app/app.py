@@ -3,7 +3,7 @@ from google.cloud import secretmanager
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 import sqlalchemy
-import create_engine, MetaData, Table, Column, Integer, String, Float
+import create_engine, MetaData, Table, Column, Integer, String, Float, Boolean
 import os
 
 app = Flask(__name__)
@@ -64,24 +64,29 @@ metadata.create_all(engine)
 
 @app.route('/')
 def index():
-    incomplete = todos.query.filter_by(complete=False).all()
-    complete = todos.query.filter_by(complete=True).all()
+    with engine.connect() as conn:
+        incomplete = conn.execute(("SELECT * from todos").where(complete=False)).fetchall()   #todos.query.filter_by(complete=False).all()
+        complete = conn.execute(("SELECT * from todos").where(complete=True)).fetchall() #todos.query.filter_by(complete=True).all()
 
-    return render_template('index.html', incomplete=incomplete, complete=complete)
+        return render_template('index.html', incomplete=incomplete, complete=complete)
 
 @app.route('/add', methods=['POST'])
 def add():
-    todo = todos(text=request.form['todoitem'], complete=False)
-    db.session.add(todo)
-    db.session.commit()
+    with engine.connect() as conn:
+        if request.method == 'POST':
+            todo = request.form["to-do item"]
+            query = "INSERT INTO todos (todo) VALUES (%s);"
+            #todo = todos(text=request.form['todoitem'], complete=False)
+            values = String(todo, complete = False)
+            conn.execute(query, values)
+            conn.commit()
 
-    return redirect(url_for('index'))
+        return redirect('index.html')
 
 @app.route('/complete/<id>')
 def complete(id):
+    with engine.connect() as conn:
+        todo = conn.execute(("UPDATE todos").where(id=int(id)).values(complete = True)) #todos.query.filter_by(id=int(id)).first()
+        conn.commit()
 
-    todo = todos.query.filter_by(id=int(id)).first()
-    todo.complete = True
-    db.session.commit()
-
-    return redirect(url_for('index'))
+        return redirect('index.html')
