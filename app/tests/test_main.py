@@ -49,6 +49,17 @@ def get_db_connection() -> sqlalchemy.engine.base.Engine:
     )
     return pool
 
+def migrate_db(db: sqlalchemy.engine.base.Engine) -> None:
+    with db.connect() as conn:
+        conn.execute(
+            sqlalchemy.text(
+                "CREATE TABLE IF NOT EXISTS votes "
+                "( vote_id SERIAL NOT NULL, time_cast timestamp NOT NULL, "
+                "candidate VARCHAR(6) NOT NULL, PRIMARY KEY (vote_id) );"
+            )
+        )
+        conn.commit()
+
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(200))
