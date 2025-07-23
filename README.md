@@ -417,3 +417,7 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://stackoverflow.com/questions/73493052/how-to-connect-to-cloud-sql-using-python
 - https://sibabalwesinyaniso.medium.com/connecting-to-a-database-and-creating-tables-using-sqlalchemy-core-52cb79e51ca4
 - https://www.w3schools.com/sql/sql_update.asp
+- https://docs.sqlalchemy.org/en/20/core/engines.html
+- https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Table
+- https://docs.sqlalchemy.org/en/20/core/dml.html
+- https://docs.sqlalchemy.org/en/20/core/connections.html#using-transactions
