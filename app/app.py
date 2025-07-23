@@ -2,8 +2,7 @@ from flask import Flask, render_template, jsonify, request, session, redirect, u
 from google.cloud import secretmanager
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
-import sqlalchemy
-import create_engine, MetaData, Table, Column, Integer, String, Float, Boolean
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, Boolean, select, insert, update, engine, URL
 import os
 
 app = Flask(__name__)
@@ -18,7 +17,7 @@ def access_secret_version(secret_id: str):
     payload = response.payload.data.decode("UTF-8")
     return payload
 
-def get_db_connection() -> sqlalchemy.engine.base.Engine:
+def get_db_connection() -> engine.base.Engine:
     user = access_secret_version("db-user")
     password = access_secret_version("db-pass")
     database = access_secret_version("db-name")
@@ -38,8 +37,8 @@ def get_db_connection() -> sqlalchemy.engine.base.Engine:
         )
         return conn
 
-    pool = sqlalchemy.create_engine(
-        sqlalchemy.engine.url.URL.create(
+    engine = create_engine(
+        engine.url.URL.create(
             "mysql+pymysql://",
             creator=getconn,
             pool_size=5,
@@ -48,14 +47,14 @@ def get_db_connection() -> sqlalchemy.engine.base.Engine:
             pool_recycle=1800,
         )
     )
-    return pool
+    return engine
 
 engine = get_db_connection () 
-metadata = sqlalchemy.MetaData()
+metadata = MetaData()
     
 todos = Table(
     "todos", metadata,
-    Column("id", Integer, primary_key=True),
+    Column("id", Integer, primary_key=True, autoincrement=True),
     Column("text", String(200)),
     Column("complete", Boolean),
 )
@@ -65,28 +64,27 @@ metadata.create_all(engine)
 @app.route('/')
 def index():
     with engine.connect() as conn:
-        incomplete = conn.execute(("SELECT * from todos").where(complete=False)).fetchall()   #todos.query.filter_by(complete=False).all()
-        complete = conn.execute(("SELECT * from todos").where(complete=True)).fetchall() #todos.query.filter_by(complete=True).all()
+        incomplete = conn.execute(select(todos).where(todos.c.complete == False)).fetchall()   #todos.query.filter_by(complete=False).all()
+        complete = conn.execute(select(todos).where(todos.c.complete == True)).fetchall() #todos.query.filter_by(complete=True).all()
 
         return render_template('index.html', incomplete=incomplete, complete=complete)
 
 @app.route('/add', methods=['POST'])
 def add():
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         if request.method == 'POST':
-            todo = request.form["to-do item"]
-            query = "INSERT INTO todos (todo) VALUES (%s);"
+            task = request.form["to-do item"]
+            query = insert(todos).values(text=task, complete = False) 
             #todo = todos(text=request.form['todoitem'], complete=False)
-            values = String(todo, complete = False)
-            conn.execute(query, values)
+            conn.execute(query)
             conn.commit()
 
         return redirect(url_for('index'))
 
 @app.route('/complete/<id>')
 def complete(id):
-    with engine.connect() as conn:
-        todo = conn.execute(("UPDATE todos").where(id=int(id)).values(complete = True)) #todos.query.filter_by(id=int(id)).first()
+    with engine.begin() as conn:
+        conn.execute(update(todos).where(todos.c.id == int(id)).values(complete = True)) #todos.query.filter_by(id=int(id)).first()
         conn.commit()
 
         return redirect(url_for('index'))
