@@ -29,23 +29,22 @@ def get_db_connection() -> engine.base.Engine:
 
     def getconn() -> pymysql.connections.Connection:
         conn: pymysql.connections.Connection = connector.connect(
+            instance_connection_string=instance_connection_name,  
+            driver="pymysql",          
             user=user,
             password=password,
-            host=instance_connection_name,
             port=port,
             db=database
         )
         return conn
 
     engine = create_engine(
-        engine.url.URL.create(
-            "mysql+pymysql://",
-            creator=getconn,
-            pool_size=5,
-            max_overflow=2,
-            pool_timeout=30,
-            pool_recycle=1800,
-        )
+        "mysql+pymysql://",
+        creator=getconn,
+        pool_size=5,
+        max_overflow=2,
+        pool_timeout=30,
+        pool_recycle=1800,        
     )
     return engine
 
@@ -72,12 +71,10 @@ def index():
 @app.route('/add', methods=['POST'])
 def add():
     with engine.begin() as conn:
-        if request.method == 'POST':
-            task = request.form["to-do item"]
-            query = insert(todos).values(text=task, complete = False) 
-            #todo = todos(text=request.form['todoitem'], complete=False)
-            conn.execute(query)
-            conn.commit()
+        task = request.form["to-do item"]
+        query = insert(todos).values(text=task, complete = False) 
+        #todo = todos(text=request.form['todoitem'], complete=False)
+        conn.execute(query)
 
         return redirect(url_for('index'))
 
@@ -85,6 +82,9 @@ def add():
 def complete(id):
     with engine.begin() as conn:
         conn.execute(update(todos).where(todos.c.id == int(id)).values(complete = True)) #todos.query.filter_by(id=int(id)).first()
-        conn.commit()
 
         return redirect(url_for('index'))
+    
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port)
