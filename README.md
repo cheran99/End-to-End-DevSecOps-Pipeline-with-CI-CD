@@ -508,7 +508,7 @@ cd app
 
 To build the container image using the Dockerfile that was created earlier, run the following command:
 ```
-gcloud builds submit --tag LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME
+sudo docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest .
 ```
 
 - `LOCATION`: the regional or multi-regional location for your repository.
@@ -518,8 +518,13 @@ gcloud builds submit --tag LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_N
 
 The command should look something like this:
 ```
-gcloud builds submit --tag europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app
+sudo docker build -t europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest .
 ```
+
+This will build the Docker image:
+
+<img width="1677" height="602" alt="image" src="https://github.com/user-attachments/assets/4b7f8323-eb1d-41ad-a771-eddaee8ae40f" />
+
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
@@ -572,3 +577,6 @@ gcloud builds submit --tag europe-west2-docker.pkg.dev/devsecops-pipeline-463112
 - https://dev.to/prodevopsguytech/writing-a-dockerfile-beginners-to-advanced-31ie
 - https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/Dockerfile
 - https://www.w3schools.com/python/python_virtualenv.asp
+- https://docs.docker.com/get-started/docker-concepts/building-images/build-tag-and-publish-an-image/#build-an-image
+- https://cloud.google.com/artifact-registry/docs/docker/authentication
+- https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling
