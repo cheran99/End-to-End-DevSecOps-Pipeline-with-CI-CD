@@ -449,6 +449,20 @@ EXPOSE 8000
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
 ```
 
+Next, create a service account for the Artifact Registry on Terraform so that it can be used to authenticate Docker with the Artifact Registry. To do this, open the `main.tf` file in the `terraform` directory and add the following resource:
+```
+resource "google_service_account" "artifactregistry_sa" {
+  account_id   = "artifactregistry-sa"
+  display_name = "Artifact Registry Service Account"
+}
+
+resource "google_project_iam_member" "artifactregistry_sa" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.artifactregistry_sa.email)
+  role     = "roles/artifactregistry.reader", "roles/artifactregistry.writer"
+}
+```
+
 
 
 
