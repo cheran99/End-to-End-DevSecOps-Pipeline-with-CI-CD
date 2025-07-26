@@ -364,14 +364,90 @@ Go to Secret Manager. You can see that the secrets have successfully been create
 
 ![image](https://github.com/user-attachments/assets/82beee44-3a79-49a1-a276-3f45131a00a1)
 
-If you want to view the secret value, such as the database password, click the secret to which the password is assigned to. Select "Actions" for the latest secret version and click "View secret value". This will show you the secret value which in this case is the database password.
+If you want to view the secret value, such as the database password, click the secret to which the password is assigned to. Select "Actions" for the latest secret version and click "View secret value". This will show you the secret value, which in this case is the database password.
 
 
 Next, go to Cloud Run and then to the Cloud Run service that was created earlier. Go to "Edit and deploy new revision" and scroll down to "Cloud SQL connections". Click "Add connection" and select the instance connection name for the MySQL instance that was created earlier, and then select "Deploy":
 
 ![image](https://github.com/user-attachments/assets/aa6161b1-357c-4fae-bd77-50cfd05cda32)
 
+### Create A Flask Application
 
+This step involves creating a Flask application before containerising it with Docker. The Flask application is a simple to-do list app that allows the user to create tasks, and when the task is complete, the user clicks the "Mark As Complete" button, and this will move the task to the "Completed Items" section while the pending tasks remain in the "Incomplete Items" section.
+
+The Flask application (`app.py`) uses the `index.html` file as its template.
+
+The directory for the Flask application should look like this:
+```
+app/
+|-- static/
+|   |-- style.css
+|-- templates/
+|   |-- index.html
+|-- app.py
+|-- requirements.txt
+```
+Ensure that the `requirements.txt` file contains the following packages along with their latest versions:
+- Flask
+- Werkzeug
+- Cloud SQL Python Connector
+- Google Cloud Secret Manager
+- SQLAlchemy
+- Gunicorn
+
+These are the packages that are required for the Flask application to function. 
+
+Before running the application on your local machine, on the WSL terminal, create the virtual environment and activate it using the following commands:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Ensure that the WSL terminal shows that you are in the main directory for this GitHub repository.
+
+On the WSL terminal, change the directory to the `app` directory. Export the environmental variables for the MySQL instance, such as its credentials, using the following command:
+```
+export GOOGLE_APPLICATION_CREDENTIALS='/path/to/service/account/key.json'
+export INSTANCE_CONNECTION_NAME='<PROJECT_ID>:<INSTANCE_REGION>:<INSTANCE_NAME>'
+export DB_USER='<YOUR_DB_USER_NAME>'
+export DB_PASS='<YOUR_DB_PASSWORD>'
+export DB_NAME='<YOUR_DB_NAME>'
+```
+
+Note: When the application is deployed to Cloud Run, it will use the latest version of the credentials stored in the Secret Manager.
+
+Once these variables have been exported, run the application using the following command:
+```
+python3 app.py
+```
+
+This is what the web application looks like:
+
+<img width="1919" height="689" alt="image" src="https://github.com/user-attachments/assets/412be365-813d-43ce-90bb-b3afa7f4f252" />
+
+This shows that the to-do list Flask application is successfully working.
+
+### Containerise The Flask Application With Docker
+
+Create a Dockerfile in the `app` directory if you haven't done so already. Ensure the file has no extensions. 
+
+The contents of the Dockerfile should look something like this:
+```
+FROM python:3.12
+
+# Install the application dependencies
+COPY requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Copy the remaining source code
+COPY . ./
+
+# Expose the port your app will be on
+EXPOSE 8000
+
+# Run the application
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
+```
 
 
 
@@ -421,3 +497,9 @@ Next, go to Cloud Run and then to the Cloud Run service that was created earlier
 - https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Table
 - https://docs.sqlalchemy.org/en/20/core/dml.html
 - https://docs.sqlalchemy.org/en/20/core/connections.html#using-transactions
+- https://docs.docker.com/guides/python/develop/
+- https://www.geeksforgeeks.org/cloud-computing/what-is-dockerfile/
+- https://docs.docker.com/get-started/docker-concepts/building-images/writing-a-dockerfile/
+- https://dev.to/prodevopsguytech/writing-a-dockerfile-beginners-to-advanced-31ie
+- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/Dockerfile
+- https://www.w3schools.com/python/python_virtualenv.asp
