@@ -449,7 +449,7 @@ EXPOSE 8000
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
 ```
 
-Next, create a service account for the Artifact Registry on Terraform so that it can be used to authenticate Docker with the Artifact Registry. To do this, open the `main.tf` file in the `terraform` directory and add the following resource:
+Next, create a service account for the Artifact Registry on Terraform so that it can be used to authenticate Docker with the Artifact Registry. To do this, open the `main.tf` file in the `terraform` directory and add the following resources:
 ```
 resource "google_service_account" "artifactregistry_sa" {
   account_id   = "artifactregistry-sa"
@@ -459,12 +459,67 @@ resource "google_service_account" "artifactregistry_sa" {
 resource "google_project_iam_member" "artifactregistry_sa" {
   project  = "devsecops-pipeline-463112"
   member   = format("serviceAccount:%s", google_service_account.artifactregistry_sa.email)
-  role     = "roles/artifactregistry.reader", "roles/artifactregistry.writer"
+  for_each = toset([
+    "roles/artifactregistry.reader",
+    "roles/artifactregistry.writer",
+  ])
+  role     = each.key
 }
 ```
 
+Next, initialise Terraform and apply the changes using the following command:
+```
+terraform init
+terraform plan
+terraform apply
+```
 
+To verify that the service account for the Artifact Registry has been created, go to "Service accounts" in the GCP portal, and you can see that the service account has been successfully created:
 
+<img width="809" height="492" alt="image" src="https://github.com/user-attachments/assets/d37c3aa8-244b-48ba-9cf3-dbb8f76c35f1" />
+
+Create a key file for this service account so that it can be used for activation.
+
+Next, on the WSL terminal, authenticate Docker to Artifact Registry using the following commands:
+```
+gcloud auth login
+gcloud auth activate-service-account <Artifact-Registry-Service-Account> --key-file="path/to/ArtifactRegistry.json"
+```
+
+Replace `path/to/ArtifactRegistry.json` with the actual file path and name of the key file. This will activate the service account. 
+
+Add the repository hostname to the Docker credential helper configuration using the following command:
+```
+gcloud auth configure-docker <region>-docker.pkg.dev
+```
+If you want to add more than one region, you can add a comma, for example:
+```
+gcloud auth configure-docker us-west1-docker.pkg.dev,asia-northeast1-docker.pkg.dev
+```
+This will update the Docker configuration file:
+
+<img width="1304" height="202" alt="image" src="https://github.com/user-attachments/assets/890a8a9b-e036-4d58-84ce-5c2da0d91279" />
+
+On the WSL terminal, change the directory to the `app` directory using the following commands:
+```
+cd ..
+cd app
+```
+
+To build the container image using the Dockerfile that was created earlier, run the following command:
+```
+gcloud builds submit --tag LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME
+```
+
+- `LOCATION`: the regional or multi-regional location for your repository.
+- `PROJECT_ID`: your Google Cloud project ID.
+- `REPOSITORY`: the name of your Artifact Registry repository.
+- `IMAGE_NAME`: the name of your container image.
+
+The command should look something like this:
+```
+gcloud builds submit --tag europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app
+```
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
