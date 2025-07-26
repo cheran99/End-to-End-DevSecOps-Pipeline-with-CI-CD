@@ -21,6 +21,21 @@ resource "google_artifact_registry_repository" "docker_repo" {
   format        = "DOCKER"
 }
 
+resource "google_service_account" "artifactregistry_sa" {
+  account_id   = "artifactregistry-sa"
+  display_name = "Artifact Registry Service Account"
+}
+
+resource "google_project_iam_member" "artifactregistry_sa" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.artifactregistry_sa.email)
+  for_each = toset([
+    "roles/artifactregistry.reader",
+    "roles/artifactregistry.writer",
+  ])
+  role     = each.key
+}
+
 resource "google_cloud_run_v2_service" "app" {
   name     = "devsecops-app"
   location = var.region
