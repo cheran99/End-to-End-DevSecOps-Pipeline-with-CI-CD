@@ -44,7 +44,10 @@ resource "google_cloud_run_v2_service" "app" {
 
   template {
     containers {
-      image = "us-docker.pkg.dev/cloudrun/container/hello"
+      image = "europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest"
+      ports {
+        container_port = 8000
+      }
     }
   }
 }
