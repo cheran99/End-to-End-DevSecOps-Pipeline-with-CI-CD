@@ -506,9 +506,14 @@ cd ..
 cd app
 ```
 
+Add the user that you use to run Docker commands to the Docker security group using the following command:
+```
+sudo usermod -a -G docker ${USER}
+```
+
 To build the container image using the Dockerfile that was created earlier, run the following command:
 ```
-sudo docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest .
+docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest .
 ```
 
 - `LOCATION`: the regional or multi-regional location for your repository.
@@ -518,13 +523,55 @@ sudo docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:la
 
 The command should look something like this:
 ```
-sudo docker build -t europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest .
+ .
 ```
 
 This will build the Docker image:
 
 <img width="1677" height="602" alt="image" src="https://github.com/user-attachments/assets/4b7f8323-eb1d-41ad-a771-eddaee8ae40f" />
 
+Next, push the Docker image to the Artifact Registry using the following command:
+```
+docker push LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest
+```
+
+For example:
+```
+docker push europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest
+```
+
+<img width="1556" height="225" alt="image" src="https://github.com/user-attachments/assets/bee07202-d861-4f8f-a70d-8944a0def068" />
+
+
+To verify that the image has been successfully pushed to the Artifact Registry, go to the GCP portal, then to the "Artifact Registry" page, and then to `app-repo` repository page where you will see that the image has successfully been built and pushed along with the latest digest:
+
+<img width="1433" height="354" alt="image" src="https://github.com/user-attachments/assets/05e47653-3c27-4f6e-ac9a-72032681624c" />
+
+The next step will be to update this image under the Cloud Run resource in Terraform so that the Cloud Run can use this image. Open the `main.tf` file and update the following configurations:
+```
+resource "google_cloud_run_v2_service" "app" {
+  name     = "devsecops-app"
+  location = var.region
+  deletion_protection = false
+  ingress = "INGRESS_TRAFFIC_ALL"
+
+  template {
+    containers {
+      image = "europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest"
+      ports {
+        container_port = 800
+      }
+    }
+  }
+}
+```
+
+Apply the changes using the following commands:
+```
+terraform init
+terraform plan
+terraform apply
+```
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
@@ -580,3 +627,4 @@ This will build the Docker image:
 - https://docs.docker.com/get-started/docker-concepts/building-images/build-tag-and-publish-an-image/#build-an-image
 - https://cloud.google.com/artifact-registry/docs/docker/authentication
 - https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling
+- https://medium.com/@prayag-sangode/create-a-docker-gcp-artifactory-registry-c271a467e574
