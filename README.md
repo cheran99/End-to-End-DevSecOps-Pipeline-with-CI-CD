@@ -521,10 +521,6 @@ docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest 
 - `REPOSITORY`: the name of your Artifact Registry repository.
 - `IMAGE_NAME`: the name of your container image.
 
-The command should look something like this:
-```
- .
-```
 
 This will build the Docker image:
 
