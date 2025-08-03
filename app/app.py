@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from google.cloud import secretmanager
 from google.cloud.sql.connector import Connector, IPTypes
-import pymysql
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, Boolean, select, insert, update, engine, URL
 import os
 

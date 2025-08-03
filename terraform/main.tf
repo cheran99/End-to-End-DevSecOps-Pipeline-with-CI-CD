@@ -48,8 +48,67 @@ resource "google_cloud_run_v2_service" "app" {
       ports {
         container_port = 8000
       }
+
+      env {
+        name = "INSTANCE_CONNECTION_NAME"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.instance_conn.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "DB_USER"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_user.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "DB_PASS"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_pass.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "DB_NAME"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_name.id
+            version = "latest"
+          }
+        }
+      }
     }
+
+    service_account = google_service_account.cloudrun_sa.email
   }
+
+  depends_on = [google_sql_database_instance.mysql_devsecops]
+}
+
+resource "google_service_account" "cloudrun_sa" {
+  account_id   = "cloudrun-sa"
+  display_name = "Cloud Run Service Account"
+}
+
+resource "google_project_iam_member" "cloudrun_sa" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
+  for_each = toset([
+    "roles/cloudsql.client",
+    "roles/secretmanager.secretAccessor",
+  ])
+  role     = each.key
 }
 
 resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
@@ -145,4 +204,20 @@ resource "google_secret_manager_secret" "db_name" {
 resource "google_secret_manager_secret_version" "db_name_version" {
   secret = google_secret_manager_secret.db_name.id
   secret_data = google_sql_database.devsecops_db.name
+}
+
+locals {
+  secrets = {
+    instance_conn = google_secret_manager_secret.instance_conn.id,
+    db_user       = google_secret_manager_secret.db_user.id,
+    db_name       = google_secret_manager_secret.db_name.id,
+    db_pass       = google_secret_manager_secret.db_pass.id,
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "cloudrun_secret_access" {
+  for_each = local.secrets
+  secret_id = each.value
+  role = "roles/secretmanager.secretAccessor"
+  member = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
 }
