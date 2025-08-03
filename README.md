@@ -229,7 +229,7 @@ Now that the resources have been provisioned, the next steps will be to provisio
 
 ### Provisioning Cloud SQL and Secret Manager With Terraform
 
-Before building an application, the MySQL instance, database, and Secret Manager need to be implemented so that the Flask application can connect to them. The Secret Manager is where the environmental variables such as instance connection name, username, password, and database name will be safely and securely stored so that when the Flask application runs, it can use these variables to connect to the MySQL instance. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
+Before building an application, the MySQL instance, database, and Secret Manager need to be implemented so that the Flask application can connect to them. The Secret Manager is where the environmental variables, such as instance connection name, username, password, and database name, will be safely and securely stored so that when the Flask application runs, it can use these variables to connect to the MySQL instance. In the WSL terminal, change the directory to the `terraform` directory. Once you are in this directory, initialise Terraform using the following command:
 ```
 terraform init
 ```
@@ -521,6 +521,10 @@ docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest 
 - `REPOSITORY`: the name of your Artifact Registry repository.
 - `IMAGE_NAME`: the name of your container image.
 
+For example:
+```
+docker build -t europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest .
+```
 
 This will build the Docker image:
 
@@ -543,7 +547,7 @@ To verify that the image has been successfully pushed to the Artifact Registry, 
 
 <img width="1433" height="354" alt="image" src="https://github.com/user-attachments/assets/05e47653-3c27-4f6e-ac9a-72032681624c" />
 
-The next step will be to update this image under the Cloud Run resource in Terraform so that the Cloud Run can use this image. Open the `main.tf` file and update the following configurations:
+The next step will be to update this image under the Cloud Run resource in Terraform so that the Cloud Run can use this image. Additionally, you will also need to integrate the environmental variables for the MySQL credentials, which are stored in the Secret Manager, into the Cloud Run resource block so that Cloud Run can use them to connect to the Cloud SQL instance. The service account for Cloud Run will also need to be created so that it has the necessary permissions to access each of the secrets in the Secret Manager and use them to connect to the Cloud SQL instance.  To do this, open the `main.tf` file and update the following configurations:
 ```
 resource "google_cloud_run_v2_service" "app" {
   name     = "devsecops-app"
@@ -555,12 +559,89 @@ resource "google_cloud_run_v2_service" "app" {
     containers {
       image = "europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest"
       ports {
-        container_port = 800
+        container_port = 8000
+      }
+
+      env {
+        name = "INSTANCE_CONNECTION_NAME"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.instance_conn.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "DB_USER"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_user.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "DB_PASS"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_pass.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "DB_NAME"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_name.id
+            version = "latest"
+          }
+        }
       }
     }
+
+    service_account = google_service_account.cloudrun_sa.email
+  }
+
+  depends_on = [google_sql_database_instance.mysql_devsecops]
+}
+
+resource "google_service_account" "cloudrun_sa" {
+  account_id   = "cloudrun-sa"
+  display_name = "Cloud Run Service Account"
+}
+
+resource "google_project_iam_member" "cloudrun_sa" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
+  for_each = toset([
+    "roles/cloudsql.client",
+    "roles/secretmanager.secretAccessor",
+  ])
+  role     = each.key
+}
+
+locals {
+  secrets = {
+    instance_conn = google_secret_manager_secret.instance_conn.id,
+    db_user       = google_secret_manager_secret.db_user.id,
+    db_name       = google_secret_manager_secret.db_name.id,
+    db_pass       = google_secret_manager_secret.db_pass.id,
   }
 }
+
+resource "google_secret_manager_secret_iam_member" "cloudrun_secret_access" {
+  for_each = local.secrets
+  secret_id = each.value
+  role = "roles/secretmanager.secretAccessor"
+  member = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
+}
 ```
+
+The required permissions for the Cloud Run service account should be `roles/cloudsql.client` and `roles/secretmanager.secretAccessor`. The `cloudsql.client` permission allows connectivity to the Cloud SQL instance, while the `secretmanager.secretAccessor` permission allows the service account to read the Secret Manager secrets. The `locals` and `google_secret_manager_secret_iam_member` resource blocks were also created to ensure that the Cloud Run service account has been granted `roles/secretmanager.secretAccessor` on each secret to ensure they are read at runtime. Without these permissions, the Cloud Run will fail during deployment or initialisation because it won't be able to retrieve the required environmental variables used for Cloud SQL connectivity. This will also cause the Cloud Run service to be unavailable as a result.
 
 Apply the changes using the following commands:
 ```
@@ -568,6 +649,17 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+This will update the Cloud Run resource block with the image and environmental variables, and create a Cloud Run service account along with its required permissions.
+
+Now, upon accessing the Cloud Run URL, the Flask application is successfully running:
+
+<img width="1919" height="700" alt="image" src="https://github.com/user-attachments/assets/1d068801-9862-4ba5-8719-c3d87683b443" />
+
+https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
+
+
+
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
