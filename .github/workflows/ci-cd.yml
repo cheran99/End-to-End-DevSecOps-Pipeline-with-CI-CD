@@ -28,6 +28,12 @@ jobs:
             service_account_key: ${{secrets.GCP_CREDENTIALS}}
             export_default_credentials: true
         
+        - name: Authenticate Docker to GCP
+          run: |
+            gcloud auth login \
+            gcloud auth activate-service-account github-actions-deployer@${{env.PROJECT_ID}}.iam.gserviceaccount.com \
+            --key-file ${{secrets.GCP_CREDENTIALS}}
+
         - name: Configure Docker for Artifact Registry 
           run: |
             gcloud auth configure-docker ${{env.REGION}}-docker.pkg.dev
