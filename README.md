@@ -715,7 +715,13 @@ gcloud iam service-accounts keys create keyfile.json \
 
 Replace the `keyfile.json` with the actual name that you want to give to the key file, and ensure that you are in the directory where you want the key file to be saved on the WSL terminal. You can name your key file `GitHub_GCP_SA_Key.json`.
 
-Once the key file has been created, open it and copy the contents
+Once the key file has been created, open it and copy the contents.
+
+Next, on this GitHub repository, go to "Settings", then to "Secrets and variables", and then to "Actions". Click "New repository secret" and paste the contents of the key file into the "Secret" box. Name the repository secret "GCP_CREDENTIALS". Click "Add secret". 
+
+Note: Never commit the JSON key file for the service account to the main branch of this repository due to security reasons. The best practice is to securely store the contents of the JSON key file using GitHub Secrets to encrypt it. 
+
+
 
 
 
