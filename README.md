@@ -658,6 +658,65 @@ Now, upon accessing the Cloud Run URL, the Flask application is successfully run
 
 https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
 
+### Building A CI/CD Pipeline Using GitHub Actions
+
+Now that the Flask application is build, containerised using Docker, pushed to the Artifact Registry, and deployed to Cloud Run, where the application is successfully working, the next step is to automate the deployment with CI/CD pipelines using GitHub Action. The purpose of this step is to ensure the software delivery process is fast, reliable, and secure by automatically building, testing, scanning, and deploying your code whenever changes are pushed to your repository. This saves a lot of time on manual deployment and reduces human error. 
+
+Before creating the workflow, the service account for GitHub Actions needs to be created on Terraform so that it can be used to authenticate GitHub Actions with GCP. The following roles need to be granted for the GitHub Actions service account to push/pull to Artifact Registry, access secrets from Secret Manager, connect to Cloud SQL, and deploy to Cloud Run:
+- `roles/artifactregistry.reader`
+- `roles/artifactregistry.writer`
+- `roles/cloudsql.client`
+- `roles/secretmanager.secretAccessor`
+- `roles/run.admin`
+- `roles/iam.serviceAccountUser`
+
+Open the `main.tf` file and add the following configurations:
+```
+resource "google_service_account" "github_actions_deployer" {
+  account_id   = "github-actions-deployer"
+  display_name = "GitHub Actions CI/CD Deployer Service Account"
+}
+
+resource "google_project_iam_member" "github_actions_deployer" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.github_actions_deployer.email)
+  for_each = toset([
+    "roles/artifactregistry.reader",
+    "roles/artifactregistry.writer",
+    "roles/cloudsql.client",
+    "roles/secretmanager.secretAccessor",
+    "roles/run.admin",
+    "roles/iam.serviceAccountUser",
+  ])
+  role     = each.key
+}
+
+resource "google_secret_manager_secret_iam_member" "github_actions_secret_access" {
+  for_each = local.secrets
+  secret_id = each.value
+  role = "roles/secretmanager.secretAccessor"
+  member = format("serviceAccount:%s", google_service_account.github_actions_deployer.email)
+}
+```
+
+Apply the changes.
+
+Next, create the service account key for the GitHub Actions using the following command:
+```
+gcloud iam service-accounts keys create KEY_FILE \
+    --iam-account=SA_NAME@PROJECT_ID.iam.gserviceaccount.com
+```
+
+For example:
+```
+gcloud iam service-accounts keys create keyfile.json \
+    --iam-account=github-actions-deployer@devsecops-pipeline-463112.iam.gserviceaccount.com
+```
+
+Replace the `keyfile.json` with the actual name that you want to give to the key file, and ensure that you are in the directory where you want the key file to be saved on the WSL terminal. You can name your key file `GitHub_GCP_SA_Key.json`.
+
+Once the key file has been created, open it and copy the contents
+
 
 
 
@@ -719,3 +778,4 @@ https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
 - https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam
 - https://developer.hashicorp.com/terraform/language/meta-arguments/for_each
 - https://cloud.google.com/iam/docs/roles-overview
+- https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-gcloud
