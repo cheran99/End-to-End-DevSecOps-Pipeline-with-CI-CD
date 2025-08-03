@@ -624,3 +624,6 @@ terraform apply
 - https://cloud.google.com/artifact-registry/docs/docker/authentication
 - https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling
 - https://medium.com/@prayag-sangode/create-a-docker-gcp-artifactory-registry-c271a467e574
+- https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam
+- https://developer.hashicorp.com/terraform/language/meta-arguments/for_each
+- https://cloud.google.com/iam/docs/roles-overview
