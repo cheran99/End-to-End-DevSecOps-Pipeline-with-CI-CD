@@ -221,3 +221,29 @@ resource "google_secret_manager_secret_iam_member" "cloudrun_secret_access" {
   role = "roles/secretmanager.secretAccessor"
   member = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
 }
+
+resource "google_service_account" "github_actions_deployer" {
+  account_id   = "github-actions-deployer"
+  display_name = "GitHub Actions CI/CD Deployer Service Account"
+}
+
+resource "google_project_iam_member" "github_actions_deployer" {
+  project  = "devsecops-pipeline-463112"
+  member   = format("serviceAccount:%s", google_service_account.github_actions_deployer.email)
+  for_each = toset([
+    "roles/artifactregistry.reader",
+    "roles/artifactregistry.writer",
+    "roles/cloudsql.client",
+    "roles/secretmanager.secretAccessor",
+    "roles/run.admin",
+    "roles/iam.serviceAccountUser",
+  ])
+  role     = each.key
+}
+
+resource "google_secret_manager_secret_iam_member" "github_actions_secret_access" {
+  for_each = local.secrets
+  secret_id = each.value
+  role = "roles/secretmanager.secretAccessor"
+  member = format("serviceAccount:%s", google_service_account.github_actions_deployer.email)
+}
