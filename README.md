@@ -785,3 +785,8 @@ Note: Never commit the JSON key file for the service account to the main branch 
 - https://developer.hashicorp.com/terraform/language/meta-arguments/for_each
 - https://cloud.google.com/iam/docs/roles-overview
 - https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-gcloud
+- https://medium.com/@pathirage/step-in-to-ci-cd-a-hands-on-guide-to-building-ci-cd-pipeline-with-github-actions-7490d6f7d8ff
+- https://docs.github.com/en/actions/tutorials/build-and-test-code/python
+- https://cloud.google.com/blog/products/devops-sre/using-github-actions-with-google-cloud-deploy
+- https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions/
+- https://medium.com/google-cloud/create-a-ci-cd-pipeline-using-github-actions-and-google-cloud-9be20ff50e97
