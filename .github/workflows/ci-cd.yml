@@ -54,5 +54,4 @@ jobs:
               --platform=managed \
               --allow-unauthenticated \
               --service-account cloudrun-sa@${{env.PROJECT_ID}}.iam.gserviceaccount.com
-              --quiet
 
