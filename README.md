@@ -790,3 +790,6 @@ Note: Never commit the JSON key file for the service account to the main branch 
 - https://cloud.google.com/blog/products/devops-sre/using-github-actions-with-google-cloud-deploy
 - https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions/
 - https://medium.com/google-cloud/create-a-ci-cd-pipeline-using-github-actions-and-google-cloud-9be20ff50e97
+- https://faun.pub/publishing-your-image-to-google-cloud-artifact-8ba7675ca594
+- https://discuss.google.dev/t/permission-artifactregistry-repositories-uploadartifacts-denied-on-resource-projects-xxx/107225/2
+- https://github.com/pulumi/pulumi-cloud-requests/issues/349
