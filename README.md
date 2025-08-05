@@ -723,6 +723,15 @@ Note: Never commit the JSON key file for the service account to the main branch 
 
 Create a file called `ci-cd.yml` in the `.github/workflow` directory. Add the jobs in this file that involve authenticating GitHub Actions to GCP, building the Docker image, pushing the image to Artifact Registry, and deploying the image to Cloud Run. 
 
+Commit the changes. If you are editing the file on your local machine, you can push the changes to this GitHub repository. This will automatically start the workflow:
+
+<img width="1919" height="805" alt="image" src="https://github.com/user-attachments/assets/c3e20b6a-5226-4691-9df5-fb22ddc4f8e5" />
+
+The screenshot above shows a successful workflow run. This automated deployment took 1 minute 19 seconds. The manual deployment time, before building this CI/CD pipeline, took 9 minutes 3 seconds. 
+
+Now let's change the appearance of the To-Do List web application. Here is the original version:
+
+<img width="1919" height="856" alt="image" src="https://github.com/user-attachments/assets/1b9ef1ed-dff9-467c-a52f-fe23aa567e8f" />
 
 
 
