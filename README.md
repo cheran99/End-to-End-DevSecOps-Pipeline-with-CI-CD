@@ -733,6 +733,13 @@ Now let's change the appearance of the To-Do List web application. Here is the o
 
 <img width="1919" height="856" alt="image" src="https://github.com/user-attachments/assets/1b9ef1ed-dff9-467c-a52f-fe23aa567e8f" />
 
+Upon making the changes in appearance and pushing the changes in the code to this repository, this automatically started the workflow, and the deployment to Cloud Run has been successful, as shown below:
+
+<img width="1911" height="798" alt="image" src="https://github.com/user-attachments/assets/25bc29e4-3684-43cb-a39c-9371fb27c086" />
+
+Here is the new appearance of the To-List application:
+
+<img width="1889" height="706" alt="image" src="https://github.com/user-attachments/assets/d3b13dd2-1892-41cc-8079-dbf6dc7a4b66" />
 
 
 
