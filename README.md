@@ -753,7 +753,15 @@ Here are more changes I made to the `index.html` and `style.css` codes that were
 
 This shows that the automated deployment to Cloud Run is successfully working, upon changes made to the code.
 
+### Implement Security Scanning To The CI/CD Pipeline
 
+This step involves implementing scanning tools such as Bandit and Trivy into the CI/CD workflow.
+
+Bandit is designed to find common security issues in the Python code by processing each file, building an abstract syntax tree (AST) from it, and running appropriate plugins against the AST nodes. It would then generate a report after Bandit finishes scanning the files.
+
+Trivy is an open-source vulnerability scanner that is designed to identify security risks, misconfigurations, exposed secrets, and licensing issues in containers, software packages, and file systems, before production. Trivy will be used to scan the Docker image before it is pushed to the Artifact Registry. 
+
+The integration of Bandit and Trivy into the CI/CD pipeline ensures that there is continuous automated detection of code and container vulnerabilities, preventing costly insecure deployments.
 
 
 
@@ -826,3 +834,8 @@ This shows that the automated deployment to Cloud Run is successfully working, u
 - https://faun.pub/publishing-your-image-to-google-cloud-artifact-8ba7675ca594
 - https://discuss.google.dev/t/permission-artifactregistry-repositories-uploadartifacts-denied-on-resource-projects-xxx/107225/2
 - https://github.com/pulumi/pulumi-cloud-requests/issues/349
+- https://trivy.dev/v0.53/ecosystem/cicd/
+- https://medium.com/%40fanjum524/office-hours-integrating-trivy-in-github-actions-ci-for-end-to-end-repository-security-devsecops-e7aa640eca51
+- https://github.com/PyCQA/bandit-action/tree/main
+- https://bandit.readthedocs.io/en/latest/ci-cd/github-actions.html
+- https://www.jit.io/resources/appsec-tools/when-and-how-to-use-trivy-to-scan-containers-for-vulnerabilities
