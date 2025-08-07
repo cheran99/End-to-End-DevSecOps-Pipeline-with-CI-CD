@@ -658,7 +658,7 @@ Now, upon accessing the Cloud Run URL, the Flask application is successfully run
 
 https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
 
-### Building A CI/CD Pipeline Using GitHub Actions
+### Build A CI/CD Pipeline Using GitHub Actions
 
 Now that the Flask application is build, containerised using Docker, pushed to the Artifact Registry, and deployed to Cloud Run, where the application is successfully working, the next step is to automate the deployment with CI/CD pipelines using GitHub Action. The purpose of this step is to ensure the software delivery process is fast, reliable, and secure by automatically building, testing, scanning, and deploying your code whenever changes are pushed to your repository. This saves a lot of time on manual deployment and reduces human error. 
 
@@ -729,6 +729,8 @@ Commit the changes. If you are editing the file on your local machine, you can p
 
 The screenshot above shows a successful workflow run. This automated deployment took 1 minute 19 seconds. The manual deployment time, before building this CI/CD pipeline, took 9 minutes 3 seconds. 
 
+### Test The CI/CD Pipeline By Making Changes To The Code 
+
 Now let's change the appearance of the To-Do List web application. Here is the original version:
 
 <img width="1919" height="856" alt="image" src="https://github.com/user-attachments/assets/1b9ef1ed-dff9-467c-a52f-fe23aa567e8f" />
@@ -741,11 +743,17 @@ Here is the new appearance of the To-List application:
 
 <img width="1889" height="706" alt="image" src="https://github.com/user-attachments/assets/d3b13dd2-1892-41cc-8079-dbf6dc7a4b66" />
 
-Here are more changes I made to the `index.html` and `style.css` codes that were pushed to this repository, which then triggered the CI/CD pipeline to deploy the changes to Cloud Run:
+Here are more changes I made to the `index.html` and `style.css` codes that were pushed to this repository, and seamlessly deployed to Cloud Run:
+
+<img width="1280" height="229" alt="image" src="https://github.com/user-attachments/assets/106b959a-2890-41a2-872b-4f99f8e69ff1" />
 
 <img width="1902" height="573" alt="image" src="https://github.com/user-attachments/assets/ed3cf4cb-d6fa-4f75-af35-cd24dddaf38f" />
 
 <img width="1919" height="679" alt="image" src="https://github.com/user-attachments/assets/def82403-9f2b-4fb5-b613-e14876d56d3e" />
+
+This shows that the automated deployment to Cloud Run is successfully working, upon changes made to the code.
+
+
 
 
 
