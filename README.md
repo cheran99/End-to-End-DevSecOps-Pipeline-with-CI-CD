@@ -741,6 +741,14 @@ Here is the new appearance of the To-List application:
 
 <img width="1889" height="706" alt="image" src="https://github.com/user-attachments/assets/d3b13dd2-1892-41cc-8079-dbf6dc7a4b66" />
 
+Here are more changes I made to the `index.html` and `style.css` codes that were pushed to this repository, which then triggered the CI/CD pipeline to deploy the changes to Cloud Run:
+
+<img width="1902" height="573" alt="image" src="https://github.com/user-attachments/assets/ed3cf4cb-d6fa-4f75-af35-cd24dddaf38f" />
+
+<img width="1919" height="679" alt="image" src="https://github.com/user-attachments/assets/def82403-9f2b-4fb5-b613-e14876d56d3e" />
+
+
+
 
 
 ## References
