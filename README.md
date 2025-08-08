@@ -839,3 +839,4 @@ The integration of Bandit and Trivy into the CI/CD pipeline ensures that there i
 - https://github.com/PyCQA/bandit-action/tree/main
 - https://bandit.readthedocs.io/en/latest/ci-cd/github-actions.html
 - https://www.jit.io/resources/appsec-tools/when-and-how-to-use-trivy-to-scan-containers-for-vulnerabilities
+- https://dev.to/luzkalidgm/how-to-use-bandit-as-a-sast-tool-for-your-python-app-1b0e
