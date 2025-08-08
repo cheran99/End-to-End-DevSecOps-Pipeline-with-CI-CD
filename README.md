@@ -810,6 +810,28 @@ As shown above, the deployment took a bit longer because of the set-up of both B
 
 If I remove the `--severity-level medium --exit-zero` line, Bandit will now fail the pipeline even if the vulnerabilities discovered are medium-level or below. For example:
 
+<img width="1898" height="858" alt="image" src="https://github.com/user-attachments/assets/0a16ce75-9e64-43c3-8c72-7e5648e99fc4" />
+
+Here are the test results that detail the issue, level of vulnerability discovered, and CWE ID (Common Weakness Enumeration):
+
+<img width="1242" height="820" alt="image" src="https://github.com/user-attachments/assets/fcbc52ba-5ced-4e7d-b461-fca3dfe322c7" />
+
+The reason why there is a medium-level vulnerability is that the Flask application binds to `0.0.0.0` as shown in `app.py`. This will expose the port to all network interfaces, meaning that when the application is running on a local machine without firewalls and/or proper access controls, it may still be reachable for external sources that are listening on `0.0.0.0` to connect to the application. While this is expected in containerised deployments to Cloud Run because GCP handles the network ingress controls, this is still a security risk in other environments. 
+
+Since the Flask application is already being containerised using Docker, and its image getting deployed to Cloud Run on GCP, the vulnerability is a false positive since the application is not running in a local environment. The best option will be to make changes to the `app.py` file by adding the `nosec` comment alongside the `B104` rule right next to the line that Bandit flagged as a medium-level vulnerability, for example:
+```
+app.run(host="0.0.0.0", port=port) #nosec B104
+```
+
+This will ensure that Bandit skips this specific security issue found in this particular line and allow the pipeline to pass as long as there are no other vulnerabilities discovered in this Python code. If there are other vulnerabilities discovered, Bandit will fail the pipeline.
+
+Save the `app.py` file and push the changes to this repository. This will restart the workflow:
+
+<img width="1891" height="933" alt="image" src="https://github.com/user-attachments/assets/25c40786-bcee-4823-a485-913cc8a5c52c" />
+
+As shown above, the workflow was successful as the Python code and Docker image have passed through Bandit and Trivy scanning before deployment to Cloud Run. The test results for Bandit show that there are no medium-level vulnerabilities since the `nosec` comment was added to the specific line in the `app.py` file:
+
+<img width="979" height="641" alt="image" src="https://github.com/user-attachments/assets/64690acc-fa12-4a30-b8de-c609c4b0ed30" />
 
 
 
@@ -888,3 +910,7 @@ If I remove the `--severity-level medium --exit-zero` line, Bandit will now fail
 - https://www.jit.io/resources/appsec-tools/when-and-how-to-use-trivy-to-scan-containers-for-vulnerabilities
 - https://dev.to/luzkalidgm/how-to-use-bandit-as-a-sast-tool-for-your-python-app-1b0e
 - https://github.com/aquasecurity/trivy-action
+- https://bandit.readthedocs.io/en/latest/plugins/b104_hardcoded_bind_all_interfaces.html
+- https://cwe.mitre.org/data/definitions/605.html
+- https://nvd.nist.gov/vuln/detail/CVE-2018-1281
+- https://calmcode.io/course/bandit/nosec
