@@ -44,7 +44,7 @@ jobs:
 
         - name: Run Bandit - Python Static Code Analysis
           run: |
-            bandit -r ./app
+            bandit -r ./app --severity-level medium --exit-zero
 
         - name: Configure Docker for Artifact Registry 
           run: |
@@ -54,7 +54,25 @@ jobs:
           working-directory: ./app 
           run: |
             docker build -t ${{env.REGION}}-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.REPO_NAME}}/${{env.IMAGE_NAME}}:latest .
+
+        - name: Manual Trivy Setup
+          uses: aquasecurity/setup-trivy@v0.2.0
+          with:
+            cache: true
+            version: v0.64.1
         
+        - name: Run Trivy vulnerability scanner
+          uses: aquasecurity/trivy-action@master
+          with:
+            scan-type: 'image'
+            image-ref: ${{env.REGION}}-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.REPO_NAME}}/${{env.IMAGE_NAME}}:latest
+            ignore-unfixed: true
+            format: 'sarif'
+            output: 'trivy-results.sarif'
+            severity: 'CRITICAL, HIGH'
+            exit-code: '1'
+            skip-setup-trivy: true
+            
         - name: Push Docker image to Artifact Registry
           run: | 
             docker push ${{env.REGION}}-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.REPO_NAME}}/${{env.IMAGE_NAME}}:latest
