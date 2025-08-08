@@ -806,7 +806,11 @@ Save the file and push the changes to this repository. This will then start the 
 
 <img width="1903" height="879" alt="image" src="https://github.com/user-attachments/assets/7bc7a020-b0fe-499f-a282-8e7c9c13b728" />
 
-As shown above, the deployment took a bit longer because of the set-up of both Bandit and Trivy. The workflow run above indicates that the Python code and Docker image were able to pass the Bandit and Trivy scanning before getting deployed to Cloud Run.
+As shown above, the deployment took a bit longer because of the set-up of both Bandit and Trivy. The workflow run above indicates that the Python code and Docker image were able to pass through the Bandit and Trivy scanning before getting deployed to Cloud Run.
+
+If I remove the `--severity-level medium --exit-zero` line, Bandit will now fail the pipeline even if the vulnerabilities discovered are medium-level or below. For example:
+
+
 
 
 
