@@ -763,7 +763,50 @@ Trivy is an open-source vulnerability scanner that is designed to identify secur
 
 The integration of Bandit and Trivy into the CI/CD pipeline ensures that there is continuous automated detection of code and container vulnerabilities, preventing costly insecure deployments.
 
+In the `ci-cd.yml` YAML file, add the following snippets that set up and run both Bandit and Trivy:
+```
+- name: Set up Python for Bandit
+  uses: actions/setup-python@v5
+  with:
+    python-version: '3.12'
 
+- name: Install Bandit
+  run: |
+    pip install bandit
+
+- name: Run Bandit - Python Static Code Analysis
+  run: |
+    bandit -r ./app --severity-level medium --exit-zero
+```
+```
+- name: Manual Trivy Setup
+  uses: aquasecurity/setup-trivy@v0.2.0
+  with:
+    cache: true
+    version: v0.64.1
+
+- name: Run Trivy vulnerability scanner
+  uses: aquasecurity/trivy-action@master
+  with:
+    scan-type: 'image'
+    image-ref: ${{env.REGION}}-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.REPO_NAME}}/${{env.IMAGE_NAME}}:latest
+    ignore-unfixed: true
+    format: 'sarif'
+    output: 'trivy-results.sarif'
+    severity: 'CRITICAL, HIGH'
+    exit-code: '1'
+    skip-setup-trivy: true
+```
+
+The `--severity-level medium --exit-zero` line ensures that Bandit will not fail the pipeline if the level of vulnerabilities that are medium or below are found. However, if a high or critical level vulnerability is discovered, then Bandit and Trivy will fail the pipeline before the code/image is deployed. 
+
+The `skip-setup-trivy: true` line ensures that Trivy won't repeatedly be set up every time the pipeline is running.
+
+Save the file and push the changes to this repository. This will then start the workflow:
+
+<img width="1903" height="879" alt="image" src="https://github.com/user-attachments/assets/7bc7a020-b0fe-499f-a282-8e7c9c13b728" />
+
+As shown above, the deployment took a bit longer because of the set-up of both Bandit and Trivy. The workflow run above indicates that the Python code and Docker image were able to pass the Bandit and Trivy scanning before getting deployed to Cloud Run.
 
 
 
@@ -840,3 +883,4 @@ The integration of Bandit and Trivy into the CI/CD pipeline ensures that there i
 - https://bandit.readthedocs.io/en/latest/ci-cd/github-actions.html
 - https://www.jit.io/resources/appsec-tools/when-and-how-to-use-trivy-to-scan-containers-for-vulnerabilities
 - https://dev.to/luzkalidgm/how-to-use-bandit-as-a-sast-tool-for-your-python-app-1b0e
+- https://github.com/aquasecurity/trivy-action
