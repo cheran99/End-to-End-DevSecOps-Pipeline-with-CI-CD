@@ -33,6 +33,19 @@ jobs:
             service_account_key: ${{secrets.GCP_CREDENTIALS}}
             export_default_credentials: true
 
+        - name: Set up Python for Bandit
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.12'
+
+        - name: Install Bandit
+          run: |
+            pip install bandit
+
+        - name: Run Bandit - Python Static Code Analysis
+          run: |
+            bandit -r ./app
+
         - name: Configure Docker for Artifact Registry 
           run: |
             gcloud auth configure-docker ${{env.REGION}}-docker.pkg.dev --quiet
