@@ -44,7 +44,8 @@ jobs:
 
         - name: Run Bandit - Python Static Code Analysis
           run: |
-            bandit -r ./app --severity-level medium --exit-zero
+            bandit -r ./app 
+            #--severity-level medium --exit-zero
 
         - name: Configure Docker for Artifact Registry 
           run: |
