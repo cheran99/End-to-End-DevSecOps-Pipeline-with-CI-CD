@@ -1,16 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
-from sqlalchemy import (create_engine, 
-                        MetaData, 
-                        Table, 
-                        Column, 
-                        Integer, 
-                        String, 
-                        Boolean, 
-                        select, 
-                        insert, 
-                        update, 
+from sqlalchemy import (create_engine,
+                        MetaData,
+                        Table,
+                        Column,
+                        Integer,
+                        String,
+                        Boolean,
+                        select,
+                        insert,
+                        update,
                         engine)
 import os
 
@@ -32,7 +32,9 @@ def get_db_connection() -> engine.base.Engine:
     user = access_secret_version("db-user")
     password = access_secret_version("db-pass")
     database = access_secret_version("db-name")
-    instance_connection_name = access_secret_version("instance-connection-name")
+    instance_connection_name = access_secret_version(
+        "instance-connection-name"
+        )
     port = 3306
 
     ip_type = IPTypes.PRIVATE if os.environ.get(
@@ -86,7 +88,9 @@ def index():
             select(todos).where(todos.c.complete.is_(True))
             ).fetchall()
 
-        return render_template('index.html', incomplete=incomplete, complete=complete)
+        return render_template(
+            'index.html', incomplete=incomplete, complete=complete
+            )
 
 
 @app.route('/add', methods=['POST'])
@@ -111,4 +115,4 @@ def complete(id):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port) # nosec B104
+    app.run(host="0.0.0.0", port=port)   # nosec B104
