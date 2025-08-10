@@ -833,6 +833,8 @@ As shown above, the workflow was successful as the Python code and Docker image 
 
 <img width="979" height="641" alt="image" src="https://github.com/user-attachments/assets/64690acc-fa12-4a30-b8de-c609c4b0ed30" />
 
+### Add Unit Tests 
+
 Now that Bandit and Trivy are functioning, the next step involves integrating `pytest` into the workflow to ensure that the Flask application is working properly. If the Flask application is not working properly, `pytest` will fail the CI/CD workflow, preventing the deployment of broken code. 
 
 To integrate `pytest` into the workflow, add the following snippet:
