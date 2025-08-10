@@ -837,7 +837,7 @@ As shown above, the workflow was successful as the Python code and Docker image 
 
 Now that Bandit and Trivy are functioning, the next step involves integrating `pytest` into the workflow to ensure that the Flask application is working properly. If the Flask application is not working properly, `pytest` will fail the CI/CD workflow, preventing the deployment of broken code. 
 
-To integrate `pytest` into the workflow, add the following snippet:
+To integrate `pytest` into the workflow, add the following snippet to the `ci-cd.yml` file:
 ```
 - name: Install Dependencies
   run: |
@@ -848,7 +848,7 @@ To integrate `pytest` into the workflow, add the following snippet:
     pytest -r ./app
 ```
 
-Create a subfolder within the `app` directory called `tests`, and in this directory, create a file called `test_app.py` so that `pystest` can find it and run it. 
+Create a subfolder within the `app` directory called `tests`, and in this directory, create a file called `test_app.py` so that `pystest` can find it and run it. Ensure that the `pytest` module is in the `requirements.txt` file.
 
 Push the changes to this repository.
 
@@ -867,6 +867,29 @@ assert response.status_code == 200 #nosec B101
 Upon pushing the changes in the code to this repository, the workflow run has been successful: 
 
 <img width="1889" height="919" alt="image" src="https://github.com/user-attachments/assets/b1535a5b-4397-4b43-a0cd-fb1c62ac1615" />
+
+### Add Code Quality And Style Checks
+
+This step involves adding a quality tool like Flake8 into the CI/CD pipeline to perform linting against the code syntax and provide instructions on how to clean it. This prevents syntax errors, bad formatting, typos, and other issues early before deployment. As a result, it saves so much time for developers and for people who review the code. This tool is easy to set up and integrate into the CI/CD pipeline. If the mentioned issues are discovered, Flake8 will fail the pipeline until the code style is clean and the said issues are resolved. 
+
+In the `ci-cd.yml` file, add the following snippet before `pytest`:
+```
+- name: Run Flake8 Linting
+  run: |
+    flake8 ./app
+```
+
+Flake8 should run before `pytest` so that the code style and syntax issues are discovered and mitigated early, before running further tests with other static code analysis tools like `pytest` and Bandit. Ensure that the Flake8 module is in the `requirements.txt` file in the `app` directory. 
+
+Save the `ci-cd.yml` file and push the changes to this repository. This will start another workflow run:
+
+<img width="1885" height="921" alt="image" src="https://github.com/user-attachments/assets/93f61ad4-7d43-4603-a05a-f97977ee0d74" />
+
+The workflow run shown above illustrates that the code style and syntax issues have been discovered by Flake8, therefore the pipeline failed:
+
+<img width="808" height="854" alt="image" src="https://github.com/user-attachments/assets/db1e507d-dfb9-4b31-abe8-52c2014839b4" />
+
+The results shown above state which areas in the code have issues, such as unused imports, lengthy lines, and spacing, along with instructions on how to clean the format. 
 
 
 
@@ -951,3 +974,5 @@ Upon pushing the changes in the code to this repository, the workflow run has be
 - https://naodeng.medium.com/pytest-tutorial-advance-usage-integration-ci-cd-and-github-action-c627c7cbbc22
 - https://cwe.mitre.org/data/definitions/703.html
 - https://realpython.com/pytest-python-testing/
+- https://flake8.pycqa.org/en/latest/
+- https://medium.com/python-pandemonium/what-is-flake8-and-why-we-should-use-it-b89bd78073f2
