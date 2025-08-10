@@ -829,10 +829,42 @@ Save the `app.py` file and push the changes to this repository. This will restar
 
 <img width="1891" height="933" alt="image" src="https://github.com/user-attachments/assets/25c40786-bcee-4823-a485-913cc8a5c52c" />
 
-As shown above, the workflow was successful as the Python code and Docker image have passed through Bandit and Trivy scanning before deployment to Cloud Run. The test results for Bandit show that there are no medium-level vulnerabilities since the `nosec` comment was added to the specific line in the `app.py` file:
+As shown above, the workflow was successful as the Python code and Docker image passed through Bandit and Trivy scanning before deployment to Cloud Run. The test results for Bandit show that there are no medium-level vulnerabilities since the `nosec` comment was added to the specific line in the `app.py` file:
 
 <img width="979" height="641" alt="image" src="https://github.com/user-attachments/assets/64690acc-fa12-4a30-b8de-c609c4b0ed30" />
 
+Now that Bandit and Trivy are functioning, the next step involves integrating `pytest` into the workflow to ensure that the Flask application is working properly. If the Flask application is not working properly, `pytest` will fail the CI/CD workflow, preventing the deployment of broken code. 
+
+To integrate `pytest` into the workflow, add the following snippet:
+```
+- name: Install Dependencies
+  run: |
+    pip install -r ./app/requirements.txt
+
+- name: Run pytest
+  run: |
+    pytest -r ./app
+```
+
+Create a subfolder within the `app` directory called `tests`, and in this directory, create a file called `test_app.py` so that `pystest` can find it and run it. 
+
+Push the changes to this repository.
+
+Here are the test results:
+<img width="1892" height="926" alt="image" src="https://github.com/user-attachments/assets/6450461c-0859-467e-8d2d-437a3803112e" />
+
+The test results show that the Flask application is working properly since it successfully passed through `pytest` scanning, however, Bandit discovered a low-level vulnerability, therefore it had failed the pipeline as shown below:
+
+<img width="1103" height="816" alt="image" src="https://github.com/user-attachments/assets/86b9d2e7-299f-4fba-ad92-2cba875811b9" />
+
+The Bandit test result shows that the vulnerability came from the `test_app.py` file that was created earlier. This is mainly due to the use of `assert` statements in the test code. Unit tests such as `pytest` rely on `assert` statements since it is used for debugging and testing, however, these tests don't run in production environments, therefore, Bandit flags this issue as a security issue. For the Python code to pass Bandit scanning, the best option would be to add the `#nosec` comment along with the `B101` rule right next to the line that has the `asset` statement in the `test_app.py` file, for example:
+```
+assert response.status_code == 200 #nosec B101
+```
+
+Upon pushing the changes in the code to this repository, the workflow run has been successful: 
+
+<img width="1889" height="919" alt="image" src="https://github.com/user-attachments/assets/b1535a5b-4397-4b43-a0cd-fb1c62ac1615" />
 
 
 
@@ -914,3 +946,6 @@ As shown above, the workflow was successful as the Python code and Docker image 
 - https://cwe.mitre.org/data/definitions/605.html
 - https://nvd.nist.gov/vuln/detail/CVE-2018-1281
 - https://calmcode.io/course/bandit/nosec
+- https://naodeng.medium.com/pytest-tutorial-advance-usage-integration-ci-cd-and-github-action-c627c7cbbc22
+- https://cwe.mitre.org/data/definitions/703.html
+- https://realpython.com/pytest-python-testing/
