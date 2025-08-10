@@ -38,13 +38,13 @@ jobs:
           with:
             python-version: '3.12'
 
-        - name: Install pytest
+        - name: Install Dependancies
           run: |
-            pip install pytest
+            pip install -r requirements.txt
 
         - name: Run pytest
           run: |
-            pytest -r ./app/tests
+            pytest -r ./app
 
         - name: Install Bandit
           run: |
