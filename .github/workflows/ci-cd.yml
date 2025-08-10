@@ -44,7 +44,7 @@ jobs:
 
         - name: Run pytest
           run: |
-            pytest -r ./app
+            pytest -r ./app/tests
 
         - name: Install Bandit
           run: |
