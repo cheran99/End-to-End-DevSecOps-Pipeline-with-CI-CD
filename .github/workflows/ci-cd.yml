@@ -48,7 +48,7 @@ jobs:
 
         - name: Run pytest
           run: |
-            PYTHONPATH=. pytest -rA ./app
+            pytest -r ./app
 
         - name: Install Bandit
           run: |
