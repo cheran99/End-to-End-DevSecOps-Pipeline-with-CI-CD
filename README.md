@@ -891,7 +891,7 @@ The workflow run shown above illustrates that the code style and syntax issues h
 
 The results shown above state which areas in the code have issues, such as unused imports, lengthy lines, and spacing, along with instructions on how to clean the format. 
 
-
+Upon making the suggested changes to ensure that the code style and synatax is clean, the Python code was able to pass quality checks which in turn allowed the code to go through the subsequent static code analysis tests in the pipeline.
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
