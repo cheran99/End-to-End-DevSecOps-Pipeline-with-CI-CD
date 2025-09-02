@@ -42,13 +42,9 @@ jobs:
           run: |
             pip install -r ./app/requirements.txt
 
-        - name: Flake8 Ignore
-          run: |
-            flake8 --ignore=E501
-
         - name: Run Flake8 Linting
           run: |
-            flake8 ./app
+            flake8 --ignore=E501 ./app
 
         - name: Run pytest
           run: |
