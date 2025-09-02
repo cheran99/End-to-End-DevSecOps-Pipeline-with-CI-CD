@@ -1,17 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
-from sqlalchemy import (create_engine,
-                        MetaData,
-                        Table,
-                        Column,
-                        Integer,
-                        String,
-                        Boolean,
-                        select,
-                        insert,
-                        update,
-                        engine)
+from sqlalchemy import (create_engine, MetaData, Table, Column, Integer, String, Boolean, select, insert, update, engine)
 import os
 
 app = Flask(__name__)
@@ -32,9 +22,7 @@ def get_db_connection() -> engine.base.Engine:
     user = access_secret_version("db-user")
     password = access_secret_version("db-pass")
     database = access_secret_version("db-name")
-    instance_connection_name = access_secret_version(
-        "instance-connection-name"
-        )
+    instance_connection_name = access_secret_version("instance-connection-name")
     port = 3306
 
     ip_type = IPTypes.PRIVATE if os.environ.get(
@@ -81,16 +69,10 @@ metadata.create_all(engine)
 @app.route('/')
 def index():
     with engine.connect() as conn:
-        incomplete = conn.execute(
-            select(todos).where(todos.c.complete.is_(False))
-            ).fetchall()
-        complete = conn.execute(
-            select(todos).where(todos.c.complete.is_(True))
-            ).fetchall()
+        incomplete = conn.execute(select(todos).where(todos.c.complete.is_(False))).fetchall()
+        complete = conn.execute(select(todos).where(todos.c.complete.is_(True))).fetchall()
 
-        return render_template(
-            'index.html', incomplete=incomplete, complete=complete
-            )
+        return render_template('index.html', incomplete=incomplete, complete=complete)
 
 
 @app.route('/add', methods=['POST'])
@@ -106,9 +88,7 @@ def add():
 @app.route('/complete/<id>')
 def complete(id):
     with engine.begin() as conn:
-        conn.execute(
-            update(todos).where(todos.c.id == int(id)).values(complete=True)
-            )
+        conn.execute(update(todos).where(todos.c.id == int(id)).values(complete=True))
 
         return redirect(url_for('index'))
 
