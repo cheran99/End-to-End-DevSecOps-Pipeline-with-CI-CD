@@ -25,9 +25,7 @@ def get_db_connection() -> engine.base.Engine:
     instance_connection_name = access_secret_version("instance-connection-name")
     port = 3306
 
-    ip_type = IPTypes.PRIVATE if os.environ.get(
-        "PRIVATE_IP"
-        ) else IPTypes.PUBLIC
+    ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC
     connector = Connector(ip_type=ip_type, refresh_strategy="LAZY")
 
     def getconn() -> pymysql.connections.Connection:
