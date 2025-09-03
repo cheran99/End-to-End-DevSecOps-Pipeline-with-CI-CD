@@ -16,6 +16,8 @@ jobs:
     deploy:
         name: Build and deploy to Cloud Run
         runs-on: ubuntu-latest
+        permissions: 
+          security-events: write
         
         steps:
         - name: Checkout Code
