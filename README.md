@@ -895,6 +895,18 @@ Upon making the suggested changes to ensure that the code style and syntax are c
 
 <img width="1896" height="943" alt="image" src="https://github.com/user-attachments/assets/5b0f2164-15fc-4155-9254-6db91d13c953" />
 
+Since the primary issue with the Python code was that some of the lines were lengthy by over 79 characters, if you want to keep the lines as lengthy as they are, you can add the `--ignore=E501` command to the following snippet:
+```
+- name: Run Flake8 Linting
+  run: |
+   flake8 --ignore=E501 ./app
+```
+
+The error code for lengthy lines that are over 79 characters is E501, so if you add this to the ignore list, flake8 will ignore this particular error, therefore, it will pass the code quality check:
+<img width="1882" height="935" alt="image" src="https://github.com/user-attachments/assets/52e5d037-14f2-431a-b32f-660820e28dc1" />
+
+As shown above, flake8 was successfully able to pass this particular error and other subsequent checks after keeping certain lines in the Python code as long as they originally were.
+
 
 
 ## References
