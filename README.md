@@ -992,3 +992,5 @@ As shown above, flake8 was successfully able to pass this particular error and o
 - https://realpython.com/pytest-python-testing/
 - https://flake8.pycqa.org/en/latest/
 - https://medium.com/python-pandemonium/what-is-flake8-and-why-we-should-use-it-b89bd78073f2
+- https://luis-sena.medium.com/creating-the-perfect-python-dockerfile-51bdec41f1c8
+- https://docs.docker.com/build/building/best-practices/#run
