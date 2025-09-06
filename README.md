@@ -907,6 +907,11 @@ The error code for lengthy lines that are over 79 characters is E501, so if you 
 
 As shown above, flake8 was successfully able to pass this particular error and other subsequent checks after keeping certain lines in the Python code as long as they originally were.
 
+### Add CSRF Protection
+
+This step involves adding Cross-Site Request Forgery (CSRF) protection in the Flask application to prevent attackers from tricking users into unknowingly submitting a request to the web application while they are still logged in. The most effective way to prevent this kind of attack is to have a CSRF token, which is a unique, dynamic value that is generated every time a user is in session. The server can verify this token whenever a request is made. This prevents attackers from forging valid requests since it is impossible to predict the token value.
+
+The CSRF protection can be enabled in the Flask application using Flask-WTF.
 
 
 ## References
@@ -994,3 +999,8 @@ As shown above, flake8 was successfully able to pass this particular error and o
 - https://medium.com/python-pandemonium/what-is-flake8-and-why-we-should-use-it-b89bd78073f2
 - https://luis-sena.medium.com/creating-the-perfect-python-dockerfile-51bdec41f1c8
 - https://docs.docker.com/build/building/best-practices/#run
+- https://www.geeksforgeeks.org/python/csrf-protection-in-flask/
+- https://flask-wtf.readthedocs.io/en/0.15.x/csrf/
+- https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+- https://flask.palletsprojects.com/en/stable/config/
+- https://www.geeksforgeeks.org/python/flask-security-with-talisman/
