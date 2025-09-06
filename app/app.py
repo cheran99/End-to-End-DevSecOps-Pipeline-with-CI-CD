@@ -11,6 +11,16 @@ app = Flask(__name__)
 
 project_id = "devsecops-pipeline-463112"
 
+
+def access_secret_version(secret_id: str):
+    from google.cloud import secretmanager
+    client = secretmanager.SecretManagerServiceClient()
+    name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+    response = client.access_secret_version(request={"name": name})
+    payload = response.payload.data.decode("UTF-8")
+    return payload
+
+
 app.config['SECRET_KEY'] = access_secret_version("flask-secret-key")
 
 csrf = CSRFProtect(app)
@@ -21,14 +31,6 @@ csp = {
     'font-src': ["'self'", 'https://fonts.gstatic.com']
 }
 Talisman(app, content_security_policy=csp, force_https=True)
-
-def access_secret_version(secret_id: str):
-    from google.cloud import secretmanager
-    client = secretmanager.SecretManagerServiceClient()
-    name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
-    response = client.access_secret_version(request={"name": name})
-    payload = response.payload.data.decode("UTF-8")
-    return payload
 
 
 def get_db_connection() -> engine.base.Engine:
