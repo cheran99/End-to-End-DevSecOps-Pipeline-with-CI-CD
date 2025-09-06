@@ -36,7 +36,7 @@ Talisman(app, content_security_policy=csp, force_https=True)
 
 
 class ToDoForm(FlaskForm):
-    name = StringField('to-do item', validators=[DataRequired()])
+    name = StringField('To-Do Item', validators=[DataRequired()])
     submit = SubmitField('Add Item')
 
 
@@ -106,8 +106,7 @@ def add():
             task = request.form["to-do item"]
             query = insert(todos).values(text=task, complete=False)
             session.execute(query)
-
-            return redirect(url_for('index'))
+        return redirect(url_for('index'))
     return redirect(url_for('index'))
 
 
