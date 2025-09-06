@@ -10,5 +10,5 @@ def client():
 
 
 def test_index_route(client):
-    response = client.get('/')
+    response = client.get('/', follow_redirects=True)
     assert response.status_code == 200   # nosec B101
