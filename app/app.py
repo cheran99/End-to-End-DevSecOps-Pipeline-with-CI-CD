@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, redirect, url_for
 from flask_talisman import Talisman
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
