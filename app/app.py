@@ -1,13 +1,26 @@
 from flask import Flask, render_template, request, redirect, url_for
+from flask_talisman import Talisman
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 from sqlalchemy import (create_engine, MetaData, Table, Column, Integer, String, Boolean, select, insert, update, engine)
+from flask_wtf import CSRFProtect
+from sqlalchemy.orm import declarative_base, Session
 import os
 
 app = Flask(__name__)
 
 project_id = "devsecops-pipeline-463112"
 
+app.config['SECRET_KEY'] = access_secret_version("flask-secret-key")
+
+csrf = CSRFProtect(app)
+
+csp = {
+    'default-src': "'self'",
+    'style-src': ["'self'", 'https://fonts.googleapis.com'],
+    'font-src': ["'self'", 'https://fonts.gstatic.com']
+}
+Talisman(app, content_security_policy=csp, force_https=True)
 
 def access_secret_version(secret_id: str):
     from google.cloud import secretmanager
@@ -52,6 +65,7 @@ def get_db_connection() -> engine.base.Engine:
 
 engine = get_db_connection()
 metadata = MetaData()
+Base = declarative_base()
 
 
 todos = Table(
@@ -61,32 +75,32 @@ todos = Table(
     Column("complete", Boolean),
 )
 
-metadata.create_all(engine)
+Base.metadata.create_all(engine)
 
 
 @app.route('/')
 def index():
-    with engine.connect() as conn:
-        incomplete = conn.execute(select(todos).where(todos.c.complete.is_(False))).fetchall()
-        complete = conn.execute(select(todos).where(todos.c.complete.is_(True))).fetchall()
+    with Session(engine) as session:
+        incomplete = session.execute(select(todos).where(todos.c.complete.is_(False))).fetchall()
+        complete = session.execute(select(todos).where(todos.c.complete.is_(True))).fetchall()
 
         return render_template('index.html', incomplete=incomplete, complete=complete)
 
 
 @app.route('/add', methods=['POST'])
 def add():
-    with engine.begin() as conn:
+    with Session(engine) as session:
         task = request.form["to-do item"]
         query = insert(todos).values(text=task, complete=False)
-        conn.execute(query)
+        session.execute(query)
 
         return redirect(url_for('index'))
 
 
 @app.route('/complete/<id>')
 def complete(id):
-    with engine.begin() as conn:
-        conn.execute(update(todos).where(todos.c.id == int(id)).values(complete=True))
+    with Session(engine) as session:
+        session.execute(update(todos).where(todos.c.id == int(id)).values(complete=True))
 
         return redirect(url_for('index'))
 

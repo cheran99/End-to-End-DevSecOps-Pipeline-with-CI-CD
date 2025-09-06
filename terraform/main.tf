@@ -206,12 +206,30 @@ resource "google_secret_manager_secret_version" "db_name_version" {
   secret_data = google_sql_database.devsecops_db.name
 }
 
+resource "random_password" "flask_secret" {
+  length  = 64
+  special = false
+}
+
+resource "google_secret_manager_secret" "flask_secret_key" {
+  secret_id  = "flask-secret-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "flask_secret_key_version" {
+  secret      = google_secret_manager_secret.flask_secret_key.id
+  secret_data = random_password.flask_secret.result
+}
+
 locals {
   secrets = {
-    instance_conn = google_secret_manager_secret.instance_conn.id,
-    db_user       = google_secret_manager_secret.db_user.id,
-    db_name       = google_secret_manager_secret.db_name.id,
-    db_pass       = google_secret_manager_secret.db_pass.id,
+    instance_conn    = google_secret_manager_secret.instance_conn.id,
+    db_user          = google_secret_manager_secret.db_user.id,
+    db_name          = google_secret_manager_secret.db_name.id,
+    db_pass          = google_secret_manager_secret.db_pass.id,
+    flask_secret_key = google_secret_manager_secret.flask_secret_key.id,
   }
 }
 
