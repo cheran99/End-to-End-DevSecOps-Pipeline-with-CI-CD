@@ -105,6 +105,7 @@ def add():
         with Session(engine) as session:
             query = insert(todos).values(text=task, complete=False)
             session.execute(query)
+            session.commit()
         return redirect(url_for('index'))
     return redirect(url_for('index'))
 
@@ -113,7 +114,7 @@ def add():
 def complete(id):
     with Session(engine) as session:
         session.execute(update(todos).where(todos.c.id == int(id)).values(complete=True))
-
+        session.commit()
         return redirect(url_for('index'))
 
 
