@@ -103,7 +103,6 @@ def add():
     if form.validate_on_submit():
         task = form.name.data
         with Session(engine) as session:
-            task = request.form["to-do item"]
             query = insert(todos).values(text=task, complete=False)
             session.execute(query)
         return redirect(url_for('index'))
