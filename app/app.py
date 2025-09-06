@@ -3,8 +3,10 @@ from flask_talisman import Talisman
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 from sqlalchemy import (create_engine, MetaData, Table, Column, Integer, String, Boolean, select, insert, update, engine)
-from flask_wtf import CSRFProtect
+from flask_wtf import FlaskForm, CSRFProtect
 from sqlalchemy.orm import declarative_base, Session
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
 import os
 
 app = Flask(__name__)
@@ -31,6 +33,11 @@ csp = {
     'font-src': ["'self'", 'https://fonts.gstatic.com']
 }
 Talisman(app, content_security_policy=csp, force_https=True)
+
+
+class ToDoForm(FlaskForm):
+    name = StringField('to-do item', validators=[DataRequired()])
+    submit = SubmitField('Add Item')
 
 
 def get_db_connection() -> engine.base.Engine:
@@ -82,21 +89,26 @@ Base.metadata.create_all(engine)
 
 @app.route('/')
 def index():
+    form = ToDoForm()
     with Session(engine) as session:
         incomplete = session.execute(select(todos).where(todos.c.complete.is_(False))).fetchall()
         complete = session.execute(select(todos).where(todos.c.complete.is_(True))).fetchall()
 
-        return render_template('index.html', incomplete=incomplete, complete=complete)
+        return render_template('index.html', incomplete=incomplete, complete=complete, form=form)
 
 
 @app.route('/add', methods=['POST'])
 def add():
-    with Session(engine) as session:
-        task = request.form["to-do item"]
-        query = insert(todos).values(text=task, complete=False)
-        session.execute(query)
+    form = ToDoForm()
+    if form.validate_on_submit():
+        task = form.name.data
+        with Session(engine) as session:
+            task = request.form["to-do item"]
+            query = insert(todos).values(text=task, complete=False)
+            session.execute(query)
 
-        return redirect(url_for('index'))
+            return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/complete/<id>')
