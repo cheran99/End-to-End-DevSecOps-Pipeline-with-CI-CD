@@ -2,6 +2,14 @@ from app.app import app
 import pytest
 
 
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = True  # ensure CSRF is enforced
+    with app.test_client() as client:
+        yield client
+
+
 @pytest.mark.security
 def test_csrf_protection(client):
     # Try posting to /add without CSRF token
