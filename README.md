@@ -885,7 +885,7 @@ Save the `ci-cd.yml` file and push the changes to this repository. This will sta
 
 <img width="1885" height="921" alt="image" src="https://github.com/user-attachments/assets/93f61ad4-7d43-4603-a05a-f97977ee0d74" />
 
-The workflow run shown above illustrates that the code style and syntax issues have been discovered by Flake8, therefore the pipeline failed:
+The workflow run shown above illustrates that Flake8 has discovered the code style and syntax issues, therefore, the pipeline failed:
 
 <img width="808" height="854" alt="image" src="https://github.com/user-attachments/assets/db1e507d-dfb9-4b31-abe8-52c2014839b4" />
 
@@ -911,9 +911,63 @@ As shown above, flake8 was successfully able to pass this particular error and o
 
 This step involves adding Cross-Site Request Forgery (CSRF) protection in the Flask application to prevent attackers from tricking users into unknowingly submitting a request to the web application while they are still logged in. The most effective way to prevent this kind of attack is to have a CSRF token, which is a unique, dynamic value that is generated every time a user is in session. The server can verify this token whenever a request is made. This prevents attackers from forging valid requests since it is impossible to predict the token value.
 
-The CSRF protection can be enabled in the Flask application using Flask-WTF. To add extra security, you can also add Talisman as an extension so that it adds the HTTPS security headers to the application, protecting it from common web attacks. This ensures that all connections to the application are secure by redirecting the HTTP traffic to HTTPS, which in turn prevents man-in-the-middle attacks and data interception.
+The CSRF protection can be enabled in the Flask application using Flask-WTF. To add extra security, you can also add Talisman as an extension so that it adds the HTTPS security headers to the application, protecting it from common web attacks. This ensures that all connections to the application are secure by redirecting the HTTP traffic to HTTPS, which in turn prevents man-in-the-middle attacks and data interception. Having both the CSRF token and Talisman supports defence-in-depth.
 
+### Test The CSRF Protection
 
+Now that the Talisman and CSRF have been implemented into the Flask application, this next step involves testing to see if the CSRF protection works. To do this, open the Cloud Run URL for the Flask application in your web browser. Once you are on this page, press F12. This will open the developer tools:
+
+<img width="1919" height="776" alt="image" src="https://github.com/user-attachments/assets/098562c4-f021-493e-adc1-ec628a1e2c16" />
+
+Ensure that you are in the "Network" tab. Add a new to-do item like you normally would. This will update the "Network" with the "add" request:
+
+<img width="512" height="646" alt="image" src="https://github.com/user-attachments/assets/5bfe01dd-cde0-43c2-8801-4f3c1b1543cd" />
+
+When you go to the "Payload" section, you can see the generated value for the CSRF token along with the to-do item:
+
+<img width="458" height="185" alt="image" src="https://github.com/user-attachments/assets/97dad489-228a-4a3a-9364-f38b4c54a774" />
+
+Now go to the "Elements" section in the developer tools. This will show the HTML structure of the web page. Go to the form HTML. You will find the hidden CSRF token input. Select the hidden CSRF token input line and right-click "Edit as HTML". You will then remove this particular line. Now, when you try adding a new item to the to-do list, it will give an error message because the CSRF token is missing:
+
+<img width="429" height="327" alt="image" src="https://github.com/user-attachments/assets/f8a7a4c9-a0db-4003-a528-c528ab9420c4" />
+
+When you look at this "add" request in the "Network" section in the developer tools, that also shows it is a "Bad request" with a status code 400.:
+
+<img width="559" height="600" alt="image" src="https://github.com/user-attachments/assets/2725b723-868f-4991-be31-01e33c4471e3" />
+
+Now, let's try to edit the CSRF token input line in the "Elements" section in the developer tools by replacing the token value with a random string:
+
+<img width="580" height="365" alt="image" src="https://github.com/user-attachments/assets/7aa19075-870a-4cbc-a1a9-df8917a0cd91" />
+
+Now, when you add a new item to the to-do list, it gives the same error message as last time:
+
+<img width="809" height="247" alt="image" src="https://github.com/user-attachments/assets/ae268fa5-5246-4e4d-8f07-951f74c4ba61" />
+<img width="536" height="222" alt="image" src="https://github.com/user-attachments/assets/648d2f51-e060-46ea-9c05-df58daaed298" />
+<img width="542" height="227" alt="image" src="https://github.com/user-attachments/assets/e19ed319-b92c-4a28-94c7-85e4649dd47e" />
+
+This shows that the CSRF protection is indeed working. 
+
+### Automate The CSRF Protection Test
+
+Now that the CSRF protection is actually working upon testing, this step involves automating this particular test with `pytest` in the CI/CD pipeline. The Flask client is created during testing, where it will attempt to submit a request without the CSRF token. The Flask WTF will then intercept the request and return with 400 Bad Request, confirming that the CSRF protection is active. To automate this particular test, create a new file called `test_csrf.py` in the `app/tests` directory and add the configurations needed to run the automated test.
+
+Push the changes to this repository. Here are the test results:
+
+<img width="1863" height="710" alt="image" src="https://github.com/user-attachments/assets/76df50b4-bc3f-4f68-aae8-f41394ae60bf" />
+
+The successful workflow run shown above illustrates that `pystest` was successfully able to pass the `test_csrf_protection` in `test_csrf.py`. This means that the CSRF protection is active.
+
+To ensure that the test is actually checking what it's supposed to, you can deliberately fail the CSRF test by doing the following:
+- Change the `app.config['WTF_CSRF_ENABLED']` from `True` to `False`. This will disable the CSRF protection, and the request without the CSRF token will succeed, however, the test assertion will fail because it expects a 400 status code:
+
+  <img width="1884" height="907" alt="image" src="https://github.com/user-attachments/assets/177a8858-2312-4c60-bccd-c0319af8e2d4" />
+  - As shown above, the `test_csrf_protection` failed because the test assertion was expecting the 400 status code, instead, the status code for the request succeeding without the CSRF token is 302. For the `pytest` to pass the `test_csrf_protection`, either the CSRF protection needs to be enabled, or the test assertion needs to expect a 302 status code instead of 400. This test confirms it catches CSRF configurations. 
+- Change the expected status code for the test assertion from 400 to 200, with CSRF protection enabled. The test will fail because the CSRF protection is enabled, and the test assertion expects a 200 status code instead of 400:
+
+  <img width="1890" height="924" alt="image" src="https://github.com/user-attachments/assets/18e28349-780f-49d5-ae44-9fc4a34c0c83" />
+  - As shown above, the test failed because the status code for the failed request, without the CSRF token, is 400, and the test assertion was expecting a 200 status code. To fix this issue, change the expected status code for the test assertion from 200 back to 400. This confirms that the assertion is meaningful and it ties to the CSRF protection.
+ 
+These test failures show that `pytest` is actually checking what it's supposed to.
 
 
 
