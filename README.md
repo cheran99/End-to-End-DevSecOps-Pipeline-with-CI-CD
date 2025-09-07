@@ -911,7 +911,9 @@ As shown above, flake8 was successfully able to pass this particular error and o
 
 This step involves adding Cross-Site Request Forgery (CSRF) protection in the Flask application to prevent attackers from tricking users into unknowingly submitting a request to the web application while they are still logged in. The most effective way to prevent this kind of attack is to have a CSRF token, which is a unique, dynamic value that is generated every time a user is in session. The server can verify this token whenever a request is made. This prevents attackers from forging valid requests since it is impossible to predict the token value.
 
-The CSRF protection can be enabled in the Flask application using Flask-WTF.
+The CSRF protection can be enabled in the Flask application using Flask-WTF. To add extra security, you can also add Talisman as an extension so that it adds the HTTPS security headers to the application, protecting it from common web attacks. This ensures that all connections to the application are secure by redirecting the HTTP traffic to HTTPS, which in turn prevents man-in-the-middle attacks and data interception.
+
+
 
 
 ## References
