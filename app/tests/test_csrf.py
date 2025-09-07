@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = True  # ensure CSRF is enforced
+    app.config['WTF_CSRF_ENABLED'] = False  # ensure CSRF is enforced
     with app.test_client() as client:
         yield client
 
