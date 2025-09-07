@@ -961,11 +961,15 @@ To ensure that the test is actually checking what it's supposed to, you can deli
 - Change the `app.config['WTF_CSRF_ENABLED']` from `True` to `False`. This will disable the CSRF protection, and the request without the CSRF token will succeed, however, the test assertion will fail because it expects a 400 status code:
 
   <img width="1884" height="907" alt="image" src="https://github.com/user-attachments/assets/177a8858-2312-4c60-bccd-c0319af8e2d4" />
-  - As shown above, the `test_csrf_protection` failed because the test assertion was expecting the 400 status code, instead, the status code for the request succeeding without the CSRF token is 302. For the `pytest` to pass the `test_csrf_protection`, either the CSRF protection needs to be enabled, or the test assertion needs to expect a 302 status code instead of 400. This test confirms it catches CSRF configurations. 
+  - As shown above, the `test_csrf_protection` failed because the test assertion was expecting the 400 status code, instead, the status code for the request succeeding without the CSRF token is 302.
+  - For the `pytest` to pass the `test_csrf_protection`, either the CSRF protection needs to be enabled, or the test assertion needs to expect a 302 status code instead of 400.
+  - This test confirms it catches CSRF configurations. 
 - Change the expected status code for the test assertion from 400 to 200, with CSRF protection enabled. The test will fail because the CSRF protection is enabled, and the test assertion expects a 200 status code instead of 400:
 
   <img width="1890" height="924" alt="image" src="https://github.com/user-attachments/assets/18e28349-780f-49d5-ae44-9fc4a34c0c83" />
-  - As shown above, the test failed because the status code for the failed request, without the CSRF token, is 400, and the test assertion was expecting a 200 status code. To fix this issue, change the expected status code for the test assertion from 200 back to 400. This confirms that the assertion is meaningful and it ties to the CSRF protection.
+  - As shown above, the test failed because the status code for the failed request, without the CSRF token, is 400, and the test assertion was expecting a 200 status code.
+  - To fix this issue, change the expected status code for the test assertion from 200 back to 400.
+  - This confirms that the assertion is meaningful and it ties to the CSRF protection.
  
 These test failures show that `pytest` is actually checking what it's supposed to.
 
