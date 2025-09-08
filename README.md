@@ -979,6 +979,38 @@ To ensure that the test is actually checking what it's supposed to, you can deli
  
 These test failures show that `pytest` is actually checking what it's supposed to.
 
+### Implement Security Best Practices In Docker Image
+
+Since the Dockerfile uses the raw `python: 3.12` as the base image, which is Debian-based, it inherits a large number of libraries. The library packages are not updated to the latest version. This increases the risk of attack surfaces because vulnerabilities can arise from unused and outdated Debian-based libraries that the app inherits when the image is built. As a consequence, if the vulnerability in the library is installed in the Docker image, it may be exploited by attackers even if the app is secure. These vulnerabilities don't come from the app, they come from the Debian layer. 
+
+The Trivy scanner would fail the security check upon scanning the Docker image because HIGH/CRITICAL-level vulnerabilities are found in the base layer:
+
+<img width="1878" height="921" alt="image" src="https://github.com/user-attachments/assets/d0d12d34-374a-4d2d-9080-7bb78bd72b38" />
+
+<img width="1314" height="738" alt="image" src="https://github.com/user-attachments/assets/f200a2b8-5607-4233-9fd8-803cacc9912b" />
+
+<img width="1294" height="857" alt="image" src="https://github.com/user-attachments/assets/a082717f-4477-492a-890d-ef276b777440" />
+
+<img width="1356" height="883" alt="image" src="https://github.com/user-attachments/assets/2eeb67b7-afcb-4e17-911f-624bad65a586" />
+
+These Trivy scanning reports above show that failures are due to a lot of outdated and unused libraries inherited from the Debian-based `python: 3.12` base image. To fix these vulnerabilities, the best course of action is to update the system packages to the latest patched versions and remove any extra packages that may contain these security risks. By having up-to-date packages and fewer unnecessary packages, this reduces the attack surfaces and lowers the vulnerabilities. This can be achieved by adding the following to the Dockerfile:
+
+```
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        libxslt1-dev \
+        libxml2-dev \
+        build-essential && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+```
+
+Whenever the image is being built, the packages in the Debian layer will consistently update to the latest version while also preventing the installation of unnecessary packages and removing them if they are present. This ensures that a smaller, more secure image is less likely to fail a vulnerability scan:
+
+<img width="1897" height="902" alt="image" src="https://github.com/user-attachments/assets/562673c0-7df0-48cd-990c-f43580dcf63e" />
+
+As shown above, the Trivy scanner was able the pass the security checks for the Docker image before being pushed to the Artifact Registry and deployed to Cloud Run.
 
 
 ## References
