@@ -10,7 +10,6 @@ import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import pymysql
-import time
 import logging
 import os
 
@@ -50,7 +49,6 @@ logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 logger.info("App started successfully")
-
 
 
 ADD_COUNTER = Counter('todo_app_requests_total', 'Total number of add requests')
