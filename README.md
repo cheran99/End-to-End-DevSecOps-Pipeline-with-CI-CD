@@ -1103,3 +1103,9 @@ As shown above, the Trivy scanner was able the pass the security checks for the 
 - https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
 - https://flask.palletsprojects.com/en/stable/config/
 - https://www.geeksforgeeks.org/python/flask-security-with-talisman/
+- https://cloud.google.com/logging/docs/setup/python
+- https://prometheus.github.io/client_python/
+- https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/import-dashboards/
+- https://www.geeksforgeeks.org/cloud-computing/google-cloud-monitoring-google-cloud-logging/
+- https://medium.com/@fenari.kostem/monitoring-your-web-app-with-prometheus-and-grafana-a-step-by-step-guide-8286dae606c7
+- https://betterstack.com/community/guides/monitoring/prometheus-python-metrics/
