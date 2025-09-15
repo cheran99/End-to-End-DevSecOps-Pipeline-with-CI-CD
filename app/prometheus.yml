@@ -4,5 +4,6 @@ global:
 scrape_configs:
   - job_name: flask-todo-app
     static_configs:
-      - targets: ['https://devsecops-app-892127943351.europe-west2.run.app:443']
-    metrics_path: /metrics
+      - targets: ['https://devsecops-app-892127943351.europe-west2.run.app']
+    metrics_path: /metrics 
+    scheme: https
