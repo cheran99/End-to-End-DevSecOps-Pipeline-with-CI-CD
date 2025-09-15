@@ -9,14 +9,11 @@ from wtforms.validators import DataRequired
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
-from prometheus_flask_exporter import PrometheusMetrics
 import pymysql
 import logging
 import os
 
 app = Flask(__name__)
-
-metrics = PrometheusMetrics(app)
 
 project_id = "devsecops-pipeline-463112"
 
