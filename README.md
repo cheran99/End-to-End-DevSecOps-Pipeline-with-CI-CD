@@ -1012,6 +1012,55 @@ Whenever the image is being built, the packages in the Debian layer will consist
 
 As shown above, the Trivy scanner was able the pass the security checks for the Docker image before being pushed to the Artifact Registry and deployed to Cloud Run.
 
+### Add Monitoring and Logging
+
+This step involves integrating logging into the Flask application so that activities are recorded and monitored. To do this, you will need to integrate Prometheus into the Flask application to monitor numerical metrics such as the number of CSRF failures, the number of added to-do list item requests, and the latency of added requests so that they can be visualised in Grafana, and Google Cloud Logging for centralised logging, so that it collects logs in one place, which are filtered through severity levels such as `INFO`, `WARNING`, and `ERROR`. 
+
+You will also need to create a `prometheus.yml` file in the `app` directory so that Prometheus can scrape logs from the Flask application. 
+
+You will also need to create a `docker-compose.yml` file, which should also be in the `app` directory. The purpose of this file is for Docker to run services within the same network in one go, such as building the image of the Flask application from the Dockerfile, running Prometheus to scrape metrics from the Flask application, and running Grafana to visualise those numerical metrics. This file ensures that all the services and networks that make up the entire application stack are set up by a single command instead of manually starting each container one by one, allowing the services within the same virtual network to communicate with one another.
+
+To set up these services and run them, you will need to run the following commands:
+```
+docker compose build
+docker compose up
+```
+
+If you need to make any changes to the `docker-compose.yml` file and any other files, you will need to stop the services by pressing `Ctrl+C` on your keyboard and running the following command to stop and remove containers, networks, images, and volumes:
+```
+docker compose down
+```
+
+Every time you make changes, you can run the `docker compose build` and `docker compose up` commands again to run the respective services. 
+
+Once these services are running, you can visit Prometheus on the web browser using the following URL: `http://localhost:9090`
+
+Once you are in this page, you can add queries for the metrics Prometheus scrapes, for example:
+- Total add requests:
+
+  <img width="1905" height="302" alt="image" src="https://github.com/user-attachments/assets/325c20da-eef5-45b7-b8fb-17470abd047d" />
+
+- Latency of added requests:
+
+  <img width="1909" height="760" alt="image" src="https://github.com/user-attachments/assets/ce9f9256-59a7-4bcb-bb69-2bf80e305049" />
+
+- Total number of CSRF failures:
+
+  <img width="1913" height="292" alt="image" src="https://github.com/user-attachments/assets/ea9548f6-3e01-4d16-872f-b673eaebdc6c" />
+
+As shown above, Prometheus is successfully scraping metrics from the Flask application.
+
+To visualise these logs, you can visit Grafana using the following URL: `http://localhost:3000`
+
+Once you are on this page, go to "Data sources" and choose Prometheus as the source. For the Prometheus server URL, use the following URL and click "Save & test": `http://prometheus:9090`
+
+Next, go to Dashboards and create a new dashboard. Create graphs for CSRF failures, total add requests, and the latency of add requests in this dashboard:
+
+<img width="1621" height="799" alt="image" src="https://github.com/user-attachments/assets/89fc5562-65fb-4deb-ab22-b9a8988feb5b" />
+
+
+
+
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
@@ -1109,3 +1158,6 @@ As shown above, the Trivy scanner was able the pass the security checks for the 
 - https://www.geeksforgeeks.org/cloud-computing/google-cloud-monitoring-google-cloud-logging/
 - https://medium.com/@fenari.kostem/monitoring-your-web-app-with-prometheus-and-grafana-a-step-by-step-guide-8286dae606c7
 - https://betterstack.com/community/guides/monitoring/prometheus-python-metrics/
+- https://grafana.com/docs/grafana-cloud/monitor-applications/asserts/enable-prom-metrics-collection/application-frameworks/flask/
+- https://github.com/SigNoz/opentelemetry-collector-prometheus-receiver-example
+- https://www.youtube.com/watch?v=moLWjeXoVso
