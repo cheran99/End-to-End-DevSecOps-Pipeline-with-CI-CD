@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, jsonify, Response, request
+from flask import Flask, render_template, redirect, url_for, jsonify, Response
 from flask_talisman import Talisman
 from google.cloud.sql.connector import Connector, IPTypes
 from sqlalchemy import (create_engine, MetaData, Table, Column, Integer, String, Boolean, select, insert, update, engine)
