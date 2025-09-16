@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm, CSRFProtect
 from sqlalchemy.orm import declarative_base, Session
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+from flask_wtf.csrf import CSRFError
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
@@ -108,10 +109,11 @@ todos = Table(
 Base.metadata.create_all(engine)
 
 
-@app.before_request
-def count_csrf_failures():
-    if request.method == 'POST' and not request.form.get('csrf_token'):
-        CSRF_FAILURES.inc()
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    CSRF_FAILURES.inc()
+    logger.warning(f"CSRF failure: {e.description}")
+    return "Bad Request: CSRF token missing or invalid", 400
 
 
 @app.route('/')
