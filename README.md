@@ -145,385 +145,100 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
      ```
      python3 app.py
      ```
-   - 
-
-The Flask application (`app.py`) uses the `index.html` file as its template.
-
-The directory for the Flask application should look like this:
-```
-app/
-|-- static/
-|   |-- style.css
-|-- templates/
-|   |-- index.html
-|-- app.py
-|-- requirements.txt
-```
-Ensure that the `requirements.txt` file contains the following packages along with their latest versions:
-- Flask
-- Werkzeug
-- Cloud SQL Python Connector
-- Google Cloud Secret Manager
-- SQLAlchemy
-- Gunicorn
-
-These are the packages that are required for the Flask application to function. 
-
-Before running the application on your local machine, on the WSL terminal, create the virtual environment and activate it using the following commands:
-```
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-Ensure that the WSL terminal shows that you are in the main directory for this GitHub repository.
-
-On the WSL terminal, change the directory to the `app` directory. Export the environmental variables for the MySQL instance, such as its credentials, using the following command:
-```
-export GOOGLE_APPLICATION_CREDENTIALS='/path/to/service/account/key.json'
-export INSTANCE_CONNECTION_NAME='<PROJECT_ID>:<INSTANCE_REGION>:<INSTANCE_NAME>'
-export DB_USER='<YOUR_DB_USER_NAME>'
-export DB_PASS='<YOUR_DB_PASSWORD>'
-export DB_NAME='<YOUR_DB_NAME>'
-```
-
-Note: When the application is deployed to Cloud Run, it will use the latest version of the credentials stored in the Secret Manager.
-
-Once these variables have been exported, run the application using the following command:
-```
-python3 app.py
-```
-
-This is what the web application looks like:
-
-<img width="1919" height="689" alt="image" src="https://github.com/user-attachments/assets/412be365-813d-43ce-90bb-b3afa7f4f252" />
-
-This shows that the to-do list Flask application is successfully working.
-
-### Containerise The Flask Application With Docker
-
-Create a Dockerfile in the `app` directory if you haven't done so already. Ensure the file has no extensions. 
-
-The contents of the Dockerfile should look something like this:
-```
-FROM python:3.12
-
-# Install the application dependencies
-COPY requirements.txt ./
-RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy the remaining source code
-COPY . ./
-
-# Expose the port your app will be on
-EXPOSE 8000
-
-# Run the application
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
-```
-
-Next, create a service account for the Artifact Registry on Terraform so that it can be used to authenticate Docker with the Artifact Registry. To do this, open the `main.tf` file in the `terraform` directory and add the following resources:
-```
-resource "google_service_account" "artifactregistry_sa" {
-  account_id   = "artifactregistry-sa"
-  display_name = "Artifact Registry Service Account"
-}
-
-resource "google_project_iam_member" "artifactregistry_sa" {
-  project  = "devsecops-pipeline-463112"
-  member   = format("serviceAccount:%s", google_service_account.artifactregistry_sa.email)
-  for_each = toset([
-    "roles/artifactregistry.reader",
-    "roles/artifactregistry.writer",
-  ])
-  role     = each.key
-}
-```
-
-Next, initialise Terraform and apply the changes using the following command:
-```
-terraform init
-terraform plan
-terraform apply
-```
-
-To verify that the service account for the Artifact Registry has been created, go to "Service accounts" in the GCP portal, and you can see that the service account has been successfully created:
-
-<img width="809" height="492" alt="image" src="https://github.com/user-attachments/assets/d37c3aa8-244b-48ba-9cf3-dbb8f76c35f1" />
-
-Create a key file for this service account so that it can be used for activation.
-
-Next, on the WSL terminal, authenticate Docker to Artifact Registry using the following commands:
-```
-gcloud auth login
-gcloud auth activate-service-account <Artifact-Registry-Service-Account> --key-file="path/to/ArtifactRegistry.json"
-```
-
-Replace `path/to/ArtifactRegistry.json` with the actual file path and name of the key file. This will activate the service account. 
-
-Add the repository hostname to the Docker credential helper configuration using the following command:
-```
-gcloud auth configure-docker <region>-docker.pkg.dev
-```
-If you want to add more than one region, you can add a comma, for example:
-```
-gcloud auth configure-docker us-west1-docker.pkg.dev,asia-northeast1-docker.pkg.dev
-```
-This will update the Docker configuration file:
-
-<img width="1304" height="202" alt="image" src="https://github.com/user-attachments/assets/890a8a9b-e036-4d58-84ce-5c2da0d91279" />
-
-On the WSL terminal, change the directory to the `app` directory using the following commands:
-```
-cd ..
-cd app
-```
-
-Add the user that you use to run Docker commands to the Docker security group using the following command:
-```
-sudo usermod -a -G docker ${USER}
-```
-
-To build the container image using the Dockerfile that was created earlier, run the following command:
-```
-docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest .
-```
-
-- `LOCATION`: the regional or multi-regional location for your repository.
-- `PROJECT_ID`: your Google Cloud project ID.
-- `REPOSITORY`: the name of your Artifact Registry repository.
-- `IMAGE_NAME`: the name of your container image.
-
-For example:
-```
-docker build -t europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest .
-```
-
-This will build the Docker image:
-
-<img width="1677" height="602" alt="image" src="https://github.com/user-attachments/assets/4b7f8323-eb1d-41ad-a771-eddaee8ae40f" />
-
-Next, push the Docker image to the Artifact Registry using the following command:
-```
-docker push LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest
-```
-
-For example:
-```
-docker push europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest
-```
-
-<img width="1556" height="225" alt="image" src="https://github.com/user-attachments/assets/bee07202-d861-4f8f-a70d-8944a0def068" />
-
-
-To verify that the image has been successfully pushed to the Artifact Registry, go to the GCP portal, then to the "Artifact Registry" page, and then to `app-repo` repository page where you will see that the image has successfully been built and pushed along with the latest digest:
-
-<img width="1433" height="354" alt="image" src="https://github.com/user-attachments/assets/05e47653-3c27-4f6e-ac9a-72032681624c" />
-
-The next step will be to update this image under the Cloud Run resource in Terraform so that the Cloud Run can use this image. Additionally, you will also need to integrate the environmental variables for the MySQL credentials, which are stored in the Secret Manager, into the Cloud Run resource block so that Cloud Run can use them to connect to the Cloud SQL instance. The service account for Cloud Run will also need to be created so that it has the necessary permissions to access each of the secrets in the Secret Manager and use them to connect to the Cloud SQL instance.  To do this, open the `main.tf` file and update the following configurations:
-```
-resource "google_cloud_run_v2_service" "app" {
-  name     = "devsecops-app"
-  location = var.region
-  deletion_protection = false
-  ingress = "INGRESS_TRAFFIC_ALL"
-
-  template {
-    containers {
-      image = "europe-west2-docker.pkg.dev/devsecops-pipeline-463112/app-repo/todo_app:latest"
-      ports {
-        container_port = 8000
-      }
-
-      env {
-        name = "INSTANCE_CONNECTION_NAME"
-        value_source {
-          secret_key_ref {
-            secret = google_secret_manager_secret.instance_conn.id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "DB_USER"
-        value_source {
-          secret_key_ref {
-            secret = google_secret_manager_secret.db_user.id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "DB_PASS"
-        value_source {
-          secret_key_ref {
-            secret = google_secret_manager_secret.db_pass.id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "DB_NAME"
-        value_source {
-          secret_key_ref {
-            secret = google_secret_manager_secret.db_name.id
-            version = "latest"
-          }
-        }
-      }
-    }
-
-    service_account = google_service_account.cloudrun_sa.email
-  }
-
-  depends_on = [google_sql_database_instance.mysql_devsecops]
-}
-
-resource "google_service_account" "cloudrun_sa" {
-  account_id   = "cloudrun-sa"
-  display_name = "Cloud Run Service Account"
-}
-
-resource "google_project_iam_member" "cloudrun_sa" {
-  project  = "devsecops-pipeline-463112"
-  member   = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
-  for_each = toset([
-    "roles/cloudsql.client",
-    "roles/secretmanager.secretAccessor",
-  ])
-  role     = each.key
-}
-
-locals {
-  secrets = {
-    instance_conn = google_secret_manager_secret.instance_conn.id,
-    db_user       = google_secret_manager_secret.db_user.id,
-    db_name       = google_secret_manager_secret.db_name.id,
-    db_pass       = google_secret_manager_secret.db_pass.id,
-  }
-}
-
-resource "google_secret_manager_secret_iam_member" "cloudrun_secret_access" {
-  for_each = local.secrets
-  secret_id = each.value
-  role = "roles/secretmanager.secretAccessor"
-  member = format("serviceAccount:%s", google_service_account.cloudrun_sa.email)
-}
-```
-
-The required permissions for the Cloud Run service account should be `roles/cloudsql.client` and `roles/secretmanager.secretAccessor`. The `cloudsql.client` permission allows connectivity to the Cloud SQL instance, while the `secretmanager.secretAccessor` permission allows the service account to read the Secret Manager secrets. The `locals` and `google_secret_manager_secret_iam_member` resource blocks were also created to ensure that the Cloud Run service account has been granted `roles/secretmanager.secretAccessor` on each secret to ensure they are read at runtime. Without these permissions, the Cloud Run will fail during deployment or initialisation because it won't be able to retrieve the required environmental variables used for Cloud SQL connectivity. This will also cause the Cloud Run service to be unavailable as a result.
-
-Apply the changes using the following commands:
-```
-terraform init
-terraform plan
-terraform apply
-```
-
-This will update the Cloud Run resource block with the image and environmental variables, and create a Cloud Run service account along with its required permissions.
-
-Now, upon accessing the Cloud Run URL, the Flask application is successfully running:
-
-<img width="1919" height="700" alt="image" src="https://github.com/user-attachments/assets/1d068801-9862-4ba5-8719-c3d87683b443" />
-
-https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
-
-### Build A CI/CD Pipeline Using GitHub Actions
-
-Now that the Flask application is build, containerised using Docker, pushed to the Artifact Registry, and deployed to Cloud Run, where the application is successfully working, the next step is to automate the deployment with CI/CD pipelines using GitHub Action. The purpose of this step is to ensure the software delivery process is fast, reliable, and secure by automatically building, testing, scanning, and deploying your code whenever changes are pushed to your repository. This saves a lot of time on manual deployment and reduces human error. 
-
-Before creating the workflow, the service account for GitHub Actions needs to be created on Terraform so that it can be used to authenticate GitHub Actions with GCP. The following roles need to be granted for the GitHub Actions service account to push/pull to Artifact Registry, access secrets from Secret Manager, connect to Cloud SQL, and deploy to Cloud Run:
-- `roles/artifactregistry.reader`
-- `roles/artifactregistry.writer`
-- `roles/cloudsql.client`
-- `roles/secretmanager.secretAccessor`
-- `roles/run.admin`
-- `roles/iam.serviceAccountUser`
-
-Open the `main.tf` file and add the following configurations:
-```
-resource "google_service_account" "github_actions_deployer" {
-  account_id   = "github-actions-deployer"
-  display_name = "GitHub Actions CI/CD Deployer Service Account"
-}
-
-resource "google_project_iam_member" "github_actions_deployer" {
-  project  = "devsecops-pipeline-463112"
-  member   = format("serviceAccount:%s", google_service_account.github_actions_deployer.email)
-  for_each = toset([
-    "roles/artifactregistry.reader",
-    "roles/artifactregistry.writer",
-    "roles/cloudsql.client",
-    "roles/secretmanager.secretAccessor",
-    "roles/run.admin",
-    "roles/iam.serviceAccountUser",
-  ])
-  role     = each.key
-}
-
-resource "google_secret_manager_secret_iam_member" "github_actions_secret_access" {
-  for_each = local.secrets
-  secret_id = each.value
-  role = "roles/secretmanager.secretAccessor"
-  member = format("serviceAccount:%s", google_service_account.github_actions_deployer.email)
-}
-```
-
-Apply the changes.
-
-Next, create the service account key for the GitHub Actions using the following command:
-```
-gcloud iam service-accounts keys create KEY_FILE \
-    --iam-account=SA_NAME@PROJECT_ID.iam.gserviceaccount.com
-```
-
-For example:
-```
-gcloud iam service-accounts keys create keyfile.json \
-    --iam-account=github-actions-deployer@devsecops-pipeline-463112.iam.gserviceaccount.com
-```
-
-Replace the `keyfile.json` with the actual name that you want to give to the key file, and ensure that you are in the directory where you want the key file to be saved on the WSL terminal. You can name your key file `GitHub_GCP_SA_Key.json`.
-
-Once the key file has been created, open it and copy the contents.
-
-Next, on this GitHub repository, go to "Settings", then to "Secrets and variables", and then to "Actions". Click "New repository secret" and paste the contents of the key file into the "Secret" box. Name the repository secret "GCP_CREDENTIALS". Click "Add secret". 
-
-Note: Never commit the JSON key file for the service account to the main branch of this repository due to security reasons. The best practice is to securely store the contents of the JSON key file using GitHub Secrets to encrypt it. 
-
-Create a file called `ci-cd.yml` in the `.github/workflow` directory. Add the jobs in this file that involve authenticating GitHub Actions to GCP, building the Docker image, pushing the image to Artifact Registry, and deploying the image to Cloud Run. 
-
-Commit the changes. If you are editing the file on your local machine, you can push the changes to this GitHub repository. This will automatically start the workflow:
-
-<img width="1919" height="805" alt="image" src="https://github.com/user-attachments/assets/c3e20b6a-5226-4691-9df5-fb22ddc4f8e5" />
-
-The screenshot above shows a successful workflow run. This automated deployment took 1 minute 19 seconds. The manual deployment time, before building this CI/CD pipeline, took 9 minutes 3 seconds. 
-
-### Test The CI/CD Pipeline By Making Changes To The Code 
-
-Now let's change the appearance of the To-Do List web application. Here is the original version:
-
-<img width="1919" height="856" alt="image" src="https://github.com/user-attachments/assets/1b9ef1ed-dff9-467c-a52f-fe23aa567e8f" />
-
-Upon making the changes in appearance and pushing the changes in the code to this repository, this automatically started the workflow, and the deployment to Cloud Run has been successful, as shown below:
-
-<img width="1911" height="798" alt="image" src="https://github.com/user-attachments/assets/25bc29e4-3684-43cb-a39c-9371fb27c086" />
-
-Here is the new appearance of the To-List application:
-
-<img width="1889" height="706" alt="image" src="https://github.com/user-attachments/assets/d3b13dd2-1892-41cc-8079-dbf6dc7a4b66" />
-
-Here are more changes I made to the `index.html` and `style.css` codes that were pushed to this repository, and seamlessly deployed to Cloud Run:
-
-<img width="1280" height="229" alt="image" src="https://github.com/user-attachments/assets/106b959a-2890-41a2-872b-4f99f8e69ff1" />
-
-<img width="1902" height="573" alt="image" src="https://github.com/user-attachments/assets/ed3cf4cb-d6fa-4f75-af35-cd24dddaf38f" />
-
-<img width="1919" height="679" alt="image" src="https://github.com/user-attachments/assets/def82403-9f2b-4fb5-b613-e14876d56d3e" />
-
-This shows that the automated deployment to Cloud Run is successfully working, upon changes made to the code.
+     <img width="1919" height="689" alt="image" src="https://github.com/user-attachments/assets/412be365-813d-43ce-90bb-b3afa7f4f252" />
+
+5. Containerise The Flask Application With Docker
+   - Create a Dockerfile in the `app` directory
+   - Create a service account for the Artifact Registry on Terraform and assign the following roles:
+     - `roles/artifactregistry.reader`
+     - `roles/artifactregistry.writer`
+   - Run:
+      ```
+      terraform init
+      terraform plan
+      terraform apply
+      ```
+   - Download the key file for this service account and save it in JSON format.
+   - Activate the service account using this key file to authenticate Docker to Artifact Registry:
+      ```
+      gcloud auth login
+      gcloud auth activate-service-account <Artifact-Registry-Service-Account> --key-file="path/to/ArtifactRegistry.json"
+      ```
+   - Add the repository hostname to the Docker credential helper configuration using the following command:
+      ```
+      gcloud auth configure-docker <region>-docker.pkg.dev
+      ```
+      <img width="1304" height="202" alt="image" src="https://github.com/user-attachments/assets/890a8a9b-e036-4d58-84ce-5c2da0d91279" />
+   - Add the user that you use to run Docker commands to the Docker security group using the following command:
+      ```
+      sudo usermod -a -G docker ${USER}
+      ```
+   - Build the Docker image:
+      ```
+      docker build -t LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest .
+      ```
+      - `LOCATION`: the regional or multi-regional location for your repository.
+      - `PROJECT_ID`: your Google Cloud project ID.
+      - `REPOSITORY`: the name of your Artifact Registry repository.
+      - `IMAGE_NAME`: the name of your container image.
+    - Push the Docker image to the Artifact Registry:
+      ```
+      docker push LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest
+      ```
+
+6. Deploy container image to Cloud Run
+   - Create a Cloud Run service account on Terraform with the following permissions:
+     - `roles/cloudsql.client`
+     - `roles/secretmanager.secretAccessor`
+     - `roles/artifactregistry.reader`
+   - Run:
+     ```
+     terraform init
+     terraform plan
+     terraform apply
+     ```
+   - Go to the `app` directory:
+     ```
+     cd app
+     ```
+   - Deploy to Cloud Run using the Cloud Run service account:
+     ```
+     gcloud run deploy SERVICE_NAME \
+      --image=LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE_NAME:latest \
+      --region=LOCATION \
+      --service-account=cloudrun-sa@PROJECT_ID.iam.gserviceaccount.com
+     ```
+     <img width="1919" height="700" alt="image" src="https://github.com/user-attachments/assets/1d068801-9862-4ba5-8719-c3d87683b443" />
+
+     https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
+
+7. Build a CI/CD pipeline using GitHub Actions to automate deployment to Cloud Run
+   - Create a GitHub Actions service account on Terraform with the following permissions:
+     - `roles/artifactregistry.reader`
+     - `roles/artifactregistry.writer`
+     - `roles/cloudsql.client`
+     - `roles/secretmanager.secretAccessor`
+     - `roles/run.admin`
+     - `roles/iam.serviceAccountUser`
+   - Create the service account key file for the GitHub Actions:
+      ```
+      gcloud iam service-accounts keys create GitHub_GCP_SA_Key.json \
+          --iam-account=github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com
+      ```
+   - Copy the contents of the key file and save it to GitHub Secrets. Note: Never commit the JSON key file for the service account to the main branch of this repository due to security reasons. The best practice is to securely store the contents of the JSON key file using GitHub Secrets to encrypt it.
+   - Create a file called `ci-cd.yml` in the `.github/workflow` directory. Add the jobs in this file that involve authenticating GitHub Actions to GCP, building the Docker image, pushing the image to Artifact Registry, and deploying the image to Cloud Run.
+   - Commit the changes. This will automatically start the workflow:
+      <img width="1919" height="805" alt="image" src="https://github.com/user-attachments/assets/c3e20b6a-5226-4691-9df5-fb22ddc4f8e5" />
+
+8. Test The CI/CD Pipeline By Making Changes To The Code
+   - Make changes to the Flask application and push it to this repository:
+     <img width="1911" height="798" alt="image" src="https://github.com/user-attachments/assets/25bc29e4-3684-43cb-a39c-9371fb27c086" />
+
+     <img width="1889" height="706" alt="image" src="https://github.com/user-attachments/assets/d3b13dd2-1892-41cc-8079-dbf6dc7a4b66" />
+
+     <img width="1902" height="573" alt="image" src="https://github.com/user-attachments/assets/ed3cf4cb-d6fa-4f75-af35-cd24dddaf38f" />
+
+     <img width="1919" height="679" alt="image" src="https://github.com/user-attachments/assets/def82403-9f2b-4fb5-b613-e14876d56d3e" />
 
 ### Implement Security Scanning To The CI/CD Pipeline
 
