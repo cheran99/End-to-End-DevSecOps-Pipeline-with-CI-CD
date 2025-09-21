@@ -1,6 +1,6 @@
 # End-to-End-DevSecOps-Pipeline-with-CI-CD
 
-## Introduction
+## 🧐 Overview
 
 At every phase of the software development lifecycle (SDLC), advanced security needs to be implemented through continuous integration and continuous delivery (CI/CD) pipelines to ensure that the risk of releasing code with vulnerabilities is detected and minimised early before production rather than leaving it at the end where the issues are more diffciult and costly to resolve. 
 
@@ -8,7 +8,7 @@ The most common tactic attackers use to access an organisation's data and assets
 
 This project highlights the integration of the end-to-end DevSecOps pipeline that automates frequent security checks, infrastructure provisioning, application deployment, and enforces security by design at every stage of the SDLC.
 
-### Objectives
+## 🎯 Objectives
 1. Utilise GitHub Actions to automate the build, test, scan, and deployment of a containerised application.
 2. Integrate security tools early in the pipeline, such as Trivy (vulnerability scanning) and Bandit (static analysis). 
 3. Provision infrastructure on Google Cloud Platform (GCP) using Terraform.
@@ -16,22 +16,53 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 5. Enable continuous deployment on Google Cloud Run or GKE.
 6. Showcase practical DevOps, DevSecOps, and cloud security skills.
 
-## Prequisites
+## 📦 Project Structure
+```
+/
+├── .github/
+│ └── workflows/ # GitHub Actions workflows (CI/CD pipelines)
+├── app/
+│ ├── static/
+│ ├── templates/
+│ ├── tests/ # unit tests/integration tests
+│ ├── app.py
+│ ├── requirements.txt
+│ └── Dockerfile
+├── terraform/
+│ ├── main.tf
+│ ├── variables.tf
+│ ├── outputs.tf
+│ └── modules/ # (if any)
+├── Dashboards/
+│ └── ... # for monitoring / logging dashboards, if applicable
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
 
-1. Create a <a href="https://cloud.google.com/"> Google Cloud Platform </a> account.
-2. <a href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli"> Install Terraform </a>:
-   - To check if Terraform is installed, run the following command:
-      `terraform -help`
-    - Initialise Terraform using the following command:
-      `terraform init`
-      ![image](https://github.com/user-attachments/assets/7cf5ffc3-e110-4941-a7ad-2f703e4bb4c9)
-3. Install Windows Subsystem for Linux (WSL) using the following command:
-   ```
-   wsl --install
-   ```
-4. <a href="https://cloud.google.com/sdk/docs/install"> Install Google Cloud CLI </a>
+## 🔧 Tech Stack
 
-## Deployment Stages
+| Layer | Technologies / Tools |
+|-------|-------------------------|
+| Infrastructure & Cloud | GCP (Cloud Run, Artifact Registry, Cloud SQL, IAM, Secret Manager) |
+| IaC / Provisioning | Terraform |
+| Application | Python (Flask), HTML/CSS |
+| Containerisation | Docker |
+| CI/CD / Automation | GitHub Actions |
+| Security / Quality | Bandit, Trivy, Flake8, pytest |
+| Monitoring & Logging (Optional / Further Work) | Prometheus, Grafana, Google Cloud Logging |
+
+## ✅ Prerequisites
+
+- A **Google Cloud Platform** account with billing enabled.  
+- Installations on your machine (or development environment / WSL):  
+    • Terraform  
+    • Google Cloud CLI (`gcloud`)  
+    • Docker  
+    • Python3 + pip + virtualenv  
+- Access/permissions to provision GCP services: IAM roles to create/run Cloud Run, Cloud SQL, Secret Manager, Artifact Registry, etc.
+
+## 🚀 Setup & Deployment
 
 ### Create a Google Cloud Project
 
