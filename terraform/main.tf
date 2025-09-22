@@ -107,6 +107,7 @@ resource "google_project_iam_member" "cloudrun_sa" {
   for_each = toset([
     "roles/cloudsql.client",
     "roles/secretmanager.secretAccessor",
+    "roles/artifactregistry.reader",
   ])
   role     = each.key
 }
