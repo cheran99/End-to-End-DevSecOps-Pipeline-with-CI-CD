@@ -240,54 +240,10 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 
      <img width="1919" height="679" alt="image" src="https://github.com/user-attachments/assets/def82403-9f2b-4fb5-b613-e14876d56d3e" />
 
-### Implement Security Scanning To The CI/CD Pipeline
+9. Implement security scanning into the CI/CD pipeline
+    - Add static code analysis (Bandit), vulnerability scanning (Trivy), unit tests (pytest), and linting (Flake8) into the CI/CD workflow.
 
-This step involves implementing scanning tools such as Bandit and Trivy into the CI/CD workflow.
-
-Bandit is designed to find common security issues in the Python code by processing each file, building an abstract syntax tree (AST) from it, and running appropriate plugins against the AST nodes. It would then generate a report after Bandit finishes scanning the files.
-
-Trivy is an open-source vulnerability scanner that is designed to identify security risks, misconfigurations, exposed secrets, and licensing issues in containers, software packages, and file systems, before production. Trivy will be used to scan the Docker image before it is pushed to the Artifact Registry. 
-
-The integration of Bandit and Trivy into the CI/CD pipeline ensures that there is continuous automated detection of code and container vulnerabilities, preventing costly insecure deployments.
-
-In the `ci-cd.yml` YAML file, add the following snippets that set up and run both Bandit and Trivy:
-```
-- name: Set up Python for Bandit
-  uses: actions/setup-python@v5
-  with:
-    python-version: '3.12'
-
-- name: Install Bandit
-  run: |
-    pip install bandit
-
-- name: Run Bandit - Python Static Code Analysis
-  run: |
-    bandit -r ./app --severity-level medium --exit-zero
-```
-```
-- name: Manual Trivy Setup
-  uses: aquasecurity/setup-trivy@v0.2.0
-  with:
-    cache: true
-    version: v0.64.1
-
-- name: Run Trivy vulnerability scanner
-  uses: aquasecurity/trivy-action@master
-  with:
-    scan-type: 'image'
-    image-ref: ${{env.REGION}}-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.REPO_NAME}}/${{env.IMAGE_NAME}}:latest
-    ignore-unfixed: true
-    format: 'sarif'
-    output: 'trivy-results.sarif'
-    severity: 'CRITICAL, HIGH'
-    exit-code: '1'
-    skip-setup-trivy: true
-```
-
-The `--severity-level medium --exit-zero` line ensures that Bandit will not fail the pipeline if the level of vulnerabilities that are medium or below are found. However, if a high or critical level vulnerability is discovered, then Bandit and Trivy will fail the pipeline before the code/image is deployed. 
-
-The `skip-setup-trivy: true` line ensures that Trivy won't repeatedly be set up every time the pipeline is running.
+10. Test the security scanning
 
 Save the file and push the changes to this repository. This will then start the workflow:
 
