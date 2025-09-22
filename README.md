@@ -244,151 +244,57 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
     - Add static code analysis (Bandit), vulnerability scanning (Trivy), unit tests (pytest), and linting (Flake8) into the CI/CD workflow.
 
 10. Test the security scanning
+    - Remove the `--severity-level medium --exit-zero` line from the `ci-cd.yml` file and run the workflow:
 
-Save the file and push the changes to this repository. This will then start the workflow:
+        <img width="1898" height="858" alt="image" src="https://github.com/user-attachments/assets/0a16ce75-9e64-43c3-8c72-7e5648e99fc4" />
 
-<img width="1903" height="879" alt="image" src="https://github.com/user-attachments/assets/7bc7a020-b0fe-499f-a282-8e7c9c13b728" />
+        <img width="1242" height="820" alt="image" src="https://github.com/user-attachments/assets/fcbc52ba-5ced-4e7d-b461-fca3dfe322c7" />
+      
+      - Add the `#nosec` comment alongside rules like `B104` next to the line that Bandit flagged as a false positive for a medium-level vulnerability in the `app.py` file and push the changes to this repository:
 
-As shown above, the deployment took a bit longer because of the set-up of both Bandit and Trivy. The workflow run above indicates that the Python code and Docker image were able to pass through the Bandit and Trivy scanning before getting deployed to Cloud Run.
+          <img width="1891" height="933" alt="image" src="https://github.com/user-attachments/assets/25c40786-bcee-4823-a485-913cc8a5c52c" />
 
-If I remove the `--severity-level medium --exit-zero` line, Bandit will now fail the pipeline even if the vulnerabilities discovered are medium-level or below. For example:
+          <img width="979" height="641" alt="image" src="https://github.com/user-attachments/assets/64690acc-fa12-4a30-b8de-c609c4b0ed30" />
 
-<img width="1898" height="858" alt="image" src="https://github.com/user-attachments/assets/0a16ce75-9e64-43c3-8c72-7e5648e99fc4" />
+    - Run code quality and style checks with Flake8:
 
-Here are the test results that detail the issue, level of vulnerability discovered, and CWE ID (Common Weakness Enumeration):
+        <img width="1885" height="921" alt="image" src="https://github.com/user-attachments/assets/93f61ad4-7d43-4603-a05a-f97977ee0d74" />
 
-<img width="1242" height="820" alt="image" src="https://github.com/user-attachments/assets/fcbc52ba-5ced-4e7d-b461-fca3dfe322c7" />
+        <img width="808" height="854" alt="image" src="https://github.com/user-attachments/assets/db1e507d-dfb9-4b31-abe8-52c2014839b4" />
+      
+      - Make the suggested changes to the Python code and push it to this repository:
+        
+        <img width="1896" height="943" alt="image" src="https://github.com/user-attachments/assets/5b0f2164-15fc-4155-9254-6db91d13c953" />
 
-The reason why there is a medium-level vulnerability is that the Flask application binds to `0.0.0.0` as shown in `app.py`. This will expose the port to all network interfaces, meaning that when the application is running on a local machine without firewalls and/or proper access controls, it may still be reachable for external sources that are listening on `0.0.0.0` to connect to the application. While this is expected in containerised deployments to Cloud Run because GCP handles the network ingress controls, this is still a security risk in other environments. 
+11. Test The CSRF Protection
+    - Open the Cloud Run URL for the Flask application in your web browser.
+    - Press F12 to open the developer tools:
 
-Since the Flask application is already being containerised using Docker, and its image getting deployed to Cloud Run on GCP, the vulnerability is a false positive since the application is not running in a local environment. The best option will be to make changes to the `app.py` file by adding the `nosec` comment alongside the `B104` rule right next to the line that Bandit flagged as a medium-level vulnerability, for example:
-```
-app.run(host="0.0.0.0", port=port) #nosec B104
-```
+      <img width="1919" height="776" alt="image" src="https://github.com/user-attachments/assets/098562c4-f021-493e-adc1-ec628a1e2c16" />
+      
+    - Add a new to-do item.
+    - Go to the "Network" tab in the developer tools and observe the "add" request:
 
-This will ensure that Bandit skips this specific security issue found in this particular line and allow the pipeline to pass as long as there are no other vulnerabilities discovered in this Python code. If there are other vulnerabilities discovered, Bandit will fail the pipeline.
+      <img width="512" height="646" alt="image" src="https://github.com/user-attachments/assets/5bfe01dd-cde0-43c2-8801-4f3c1b1543cd" />
+      
+    - Go to the "Payload" section to view the generated value for the CSRF token along with the added to-do item:
 
-Save the `app.py` file and push the changes to this repository. This will restart the workflow:
+      <img width="458" height="185" alt="image" src="https://github.com/user-attachments/assets/97dad489-228a-4a3a-9364-f38b4c54a774" />
+      
+    - Go to the "Elements" section in the developer tools.
+    - Find the CSRF token line and replace the token value with a random string:
 
-<img width="1891" height="933" alt="image" src="https://github.com/user-attachments/assets/25c40786-bcee-4823-a485-913cc8a5c52c" />
+      <img width="580" height="365" alt="image" src="https://github.com/user-attachments/assets/7aa19075-870a-4cbc-a1a9-df8917a0cd91" />
+      
+    - Add a new to-do list item:
 
-As shown above, the workflow was successful as the Python code and Docker image passed through Bandit and Trivy scanning before deployment to Cloud Run. The test results for Bandit show that there are no medium-level vulnerabilities since the `nosec` comment was added to the specific line in the `app.py` file:
+      <img width="809" height="247" alt="image" src="https://github.com/user-attachments/assets/ae268fa5-5246-4e4d-8f07-951f74c4ba61" />
+      
+      <img width="536" height="222" alt="image" src="https://github.com/user-attachments/assets/648d2f51-e060-46ea-9c05-df58daaed298" />
+      
+      <img width="542" height="227" alt="image" src="https://github.com/user-attachments/assets/e19ed319-b92c-4a28-94c7-85e4649dd47e" />
 
-<img width="979" height="641" alt="image" src="https://github.com/user-attachments/assets/64690acc-fa12-4a30-b8de-c609c4b0ed30" />
 
-### Add Unit Tests 
-
-Now that Bandit and Trivy are functioning, the next step involves integrating `pytest` into the workflow to ensure that the Flask application is working properly. If the Flask application is not working properly, `pytest` will fail the CI/CD workflow, preventing the deployment of broken code. 
-
-To integrate `pytest` into the workflow, add the following snippet to the `ci-cd.yml` file:
-```
-- name: Install Dependencies
-  run: |
-    pip install -r ./app/requirements.txt
-
-- name: Run pytest
-  run: |
-    pytest -r ./app
-```
-
-Create a subfolder within the `app` directory called `tests`, and in this directory, create a file called `test_app.py` so that `pystest` can find it and run it. Ensure that the `pytest` module is in the `requirements.txt` file.
-
-Push the changes to this repository.
-
-Here are the test results:
-<img width="1892" height="926" alt="image" src="https://github.com/user-attachments/assets/6450461c-0859-467e-8d2d-437a3803112e" />
-
-The test results show that the Flask application is working properly since it successfully passed through `pytest` scanning, however, Bandit discovered a low-level vulnerability, therefore it had failed the pipeline as shown below:
-
-<img width="1103" height="816" alt="image" src="https://github.com/user-attachments/assets/86b9d2e7-299f-4fba-ad92-2cba875811b9" />
-
-The Bandit test result shows that the vulnerability came from the `test_app.py` file that was created earlier. This is mainly due to the use of `assert` statements in the test code. Unit tests such as `pytest` rely on `assert` statements since it is used for debugging and testing, however, these tests don't run in production environments, therefore, Bandit flags this issue as a security issue. For the Python code to pass Bandit scanning, the best option would be to add the `#nosec` comment along with the `B101` rule right next to the line that has the `asset` statement in the `test_app.py` file, for example:
-```
-assert response.status_code == 200 #nosec B101
-```
-
-Upon pushing the changes in the code to this repository, the workflow run has been successful: 
-
-<img width="1889" height="919" alt="image" src="https://github.com/user-attachments/assets/b1535a5b-4397-4b43-a0cd-fb1c62ac1615" />
-
-### Add Code Quality And Style Checks
-
-This step involves adding a quality tool like Flake8 into the CI/CD pipeline to perform linting against the code syntax and provide instructions on how to clean it. This prevents syntax errors, bad formatting, typos, and other issues early before deployment. As a result, it saves so much time for developers and for people who review the code. This tool is easy to set up and integrate into the CI/CD pipeline. If the mentioned issues are discovered, Flake8 will fail the pipeline until the code style is clean and the said issues are resolved. 
-
-In the `ci-cd.yml` file, add the following snippet before `pytest`:
-```
-- name: Run Flake8 Linting
-  run: |
-    flake8 ./app
-```
-
-Flake8 should run before `pytest` so that the code style and syntax issues are discovered and mitigated early, before running further tests with other static code analysis tools like `pytest` and Bandit. Ensure that the Flake8 module is in the `requirements.txt` file in the `app` directory. 
-
-Save the `ci-cd.yml` file and push the changes to this repository. This will start another workflow run:
-
-<img width="1885" height="921" alt="image" src="https://github.com/user-attachments/assets/93f61ad4-7d43-4603-a05a-f97977ee0d74" />
-
-The workflow run shown above illustrates that Flake8 has discovered the code style and syntax issues, therefore, the pipeline failed:
-
-<img width="808" height="854" alt="image" src="https://github.com/user-attachments/assets/db1e507d-dfb9-4b31-abe8-52c2014839b4" />
-
-The results shown above state which areas in the code have issues, such as unused imports, lengthy lines, and spacing, along with instructions on how to clean the format. 
-
-Upon making the suggested changes to ensure that the code style and syntax are clean, the Python code was able to pass quality checks, which in turn allowed the code to go through subsequent static code analysis tests in the pipeline:
-
-<img width="1896" height="943" alt="image" src="https://github.com/user-attachments/assets/5b0f2164-15fc-4155-9254-6db91d13c953" />
-
-Since the primary issue with the Python code was that some of the lines were lengthy by over 79 characters, if you want to keep the lines as lengthy as they are, you can add the `--ignore=E501` command to the following snippet:
-```
-- name: Run Flake8 Linting
-  run: |
-   flake8 --ignore=E501 ./app
-```
-
-The error code for lengthy lines that are over 79 characters is E501, so if you add this to the ignore list, flake8 will ignore this particular error, therefore, it will pass the code quality check:
-<img width="1882" height="935" alt="image" src="https://github.com/user-attachments/assets/52e5d037-14f2-431a-b32f-660820e28dc1" />
-
-As shown above, flake8 was successfully able to pass this particular error and other subsequent checks after keeping certain lines in the Python code as long as they originally were.
-
-### Add CSRF Protection
-
-This step involves adding Cross-Site Request Forgery (CSRF) protection in the Flask application to prevent attackers from tricking users into unknowingly submitting a request to the web application while they are still logged in. The most effective way to prevent this kind of attack is to have a CSRF token, which is a unique, dynamic value that is generated every time a user is in session. The server can verify this token whenever a request is made. This prevents attackers from forging valid requests since it is impossible to predict the token value.
-
-The CSRF protection can be enabled in the Flask application using Flask-WTF. To add extra security, you can also add Talisman as an extension so that it adds the HTTPS security headers to the application, protecting it from common web attacks. This ensures that all connections to the application are secure by redirecting the HTTP traffic to HTTPS, which in turn prevents man-in-the-middle attacks and data interception. Having both the CSRF token and Talisman supports defence-in-depth.
-
-### Test The CSRF Protection
-
-Now that the Talisman and CSRF have been implemented into the Flask application, this next step involves testing to see if the CSRF protection works. To do this, open the Cloud Run URL for the Flask application in your web browser. Once you are on this page, press F12. This will open the developer tools:
-
-<img width="1919" height="776" alt="image" src="https://github.com/user-attachments/assets/098562c4-f021-493e-adc1-ec628a1e2c16" />
-
-Ensure that you are in the "Network" tab. Add a new to-do item like you normally would. This will update the "Network" with the "add" request:
-
-<img width="512" height="646" alt="image" src="https://github.com/user-attachments/assets/5bfe01dd-cde0-43c2-8801-4f3c1b1543cd" />
-
-When you go to the "Payload" section, you can see the generated value for the CSRF token along with the to-do item:
-
-<img width="458" height="185" alt="image" src="https://github.com/user-attachments/assets/97dad489-228a-4a3a-9364-f38b4c54a774" />
-
-Now go to the "Elements" section in the developer tools. This will show the HTML structure of the web page. Go to the form HTML. You will find the hidden CSRF token input. Select the hidden CSRF token input line and right-click "Edit as HTML". You will then remove this particular line. Now, when you try adding a new item to the to-do list, it will give an error message because the CSRF token is missing:
-
-<img width="429" height="327" alt="image" src="https://github.com/user-attachments/assets/f8a7a4c9-a0db-4003-a528-c528ab9420c4" />
-
-When you look at this "add" request in the "Network" section in the developer tools, that also shows it is a "Bad request" with a status code 400.:
-
-<img width="559" height="600" alt="image" src="https://github.com/user-attachments/assets/2725b723-868f-4991-be31-01e33c4471e3" />
-
-Now, let's try to edit the CSRF token input line in the "Elements" section in the developer tools by replacing the token value with a random string:
-
-<img width="580" height="365" alt="image" src="https://github.com/user-attachments/assets/7aa19075-870a-4cbc-a1a9-df8917a0cd91" />
-
-Now, when you add a new item to the to-do list, it gives the same error message as last time:
-
-<img width="809" height="247" alt="image" src="https://github.com/user-attachments/assets/ae268fa5-5246-4e4d-8f07-951f74c4ba61" />
-<img width="536" height="222" alt="image" src="https://github.com/user-attachments/assets/648d2f51-e060-46ea-9c05-df58daaed298" />
-<img width="542" height="227" alt="image" src="https://github.com/user-attachments/assets/e19ed319-b92c-4a28-94c7-85e4649dd47e" />
-
-This shows that the CSRF protection is indeed working. 
 
 ### Automate The CSRF Protection Test
 
