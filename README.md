@@ -266,7 +266,7 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
         
         <img width="1896" height="943" alt="image" src="https://github.com/user-attachments/assets/5b0f2164-15fc-4155-9254-6db91d13c953" />
 
-11. Test The CSRF Protection
+11. Test the CSRF protection
     - Open the Cloud Run URL for the Flask application in your web browser.
     - Press F12 to open the developer tools:
 
@@ -296,120 +296,82 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 
 
 
-### Automate The CSRF Protection Test
+12. Automate the CSRF protection test
+    - Create a `test_csrf.py` file in the `app/tests` directory.
+    - Add the Python code for `pytest` to run the automated tests in the CI/CD pipeline.
+    - Push the changes to the repository:
 
-Now that the CSRF protection is actually working upon testing, this step involves automating this particular test with `pytest` in the CI/CD pipeline. The Flask client is created during testing, where it will attempt to submit a request without the CSRF token. The Flask WTF will then intercept the request and return with 400 Bad Request, confirming that the CSRF protection is active. To automate this particular test, create a new file called `test_csrf.py` in the `app/tests` directory and add the configurations needed to run the automated test.
+      <img width="1863" height="710" alt="image" src="https://github.com/user-attachments/assets/76df50b4-bc3f-4f68-aae8-f41394ae60bf" />
 
-Push the changes to this repository. Here are the test results:
+13. Test the automated CSRF protection test
+    - Change the value for the `app.config['WTF_CSRF_ENABLED']` line in the `test_csrf.py` file from `True` to `False`, and push the changes to this repository:
 
-<img width="1863" height="710" alt="image" src="https://github.com/user-attachments/assets/76df50b4-bc3f-4f68-aae8-f41394ae60bf" />
+      <img width="1884" height="907" alt="image" src="https://github.com/user-attachments/assets/177a8858-2312-4c60-bccd-c0319af8e2d4" />
+    - Change the value for the `app.config['WTF_CSRF_ENABLED']` back to `True`.
+    - Change the test assertion status code from 400 to 200, and push the changes to this repository:
 
-The successful workflow run shown above illustrates that `pystest` was successfully able to pass the `test_csrf_protection` in `test_csrf.py`. This means that the CSRF protection is active.
+      <img width="1890" height="924" alt="image" src="https://github.com/user-attachments/assets/18e28349-780f-49d5-ae44-9fc4a34c0c83" />
+    - Change the expected status code for the test assertion from 200 back to 400 and push the changes to this repository.
 
-To ensure that the test is actually checking what it's supposed to, you can deliberately fail the CSRF test by doing the following:
-- Change the `app.config['WTF_CSRF_ENABLED']` from `True` to `False`. This will disable the CSRF protection, and the request without the CSRF token will succeed, however, the test assertion will fail because it expects a 400 status code:
+14. Implement security best practices in the Docker image
+    - Run a Trivy scan through the GitHub Actions workflow run.
+    - The scan would fail the security check if HIGH/CRITICAL level vulnerabilities are found:
 
-  <img width="1884" height="907" alt="image" src="https://github.com/user-attachments/assets/177a8858-2312-4c60-bccd-c0319af8e2d4" />
-  
-  - As shown above, the `test_csrf_protection` failed because the test assertion was expecting the 400 status code, instead, the status code for the request succeeding without the CSRF token is 302.
-    
-  - For the `pytest` to pass the `test_csrf_protection`, either the CSRF protection needs to be enabled, or the test assertion needs to expect a 302 status code instead of 400.
-    
-  - This test confirms it catches CSRF configurations. 
-- Change the expected status code for the test assertion from 400 to 200, with CSRF protection enabled. The test will fail because the CSRF protection is enabled, and the test assertion expects a 200 status code instead of 400:
+      <img width="1878" height="921" alt="image" src="https://github.com/user-attachments/assets/d0d12d34-374a-4d2d-9080-7bb78bd72b38" />
 
-  <img width="1890" height="924" alt="image" src="https://github.com/user-attachments/assets/18e28349-780f-49d5-ae44-9fc4a34c0c83" />
-  
-  - As shown above, the test failed because the status code for the failed request, without the CSRF token, is 400, and the test assertion was expecting a 200 status code.
+      <img width="1314" height="738" alt="image" src="https://github.com/user-attachments/assets/f200a2b8-5607-4233-9fd8-803cacc9912b" />
 
-  - To fix this issue, change the expected status code for the test assertion from 200 back to 400.
+      <img width="1294" height="857" alt="image" src="https://github.com/user-attachments/assets/a082717f-4477-492a-890d-ef276b777440" />
 
-  - This confirms that the assertion is meaningful and it ties to the CSRF protection.
- 
-These test failures show that `pytest` is actually checking what it's supposed to.
+      <img width="1356" height="883" alt="image" src="https://github.com/user-attachments/assets/2eeb67b7-afcb-4e17-911f-624bad65a586" />
 
-### Implement Security Best Practices In Docker Image
+    - To minimise the vulnerabilities, add the following configurations to the Dockerfile to ensure the system packages are consistently up-to-date with the latest patches, whilst removing any unnecessary extra packages:
+      ```
+      RUN apt-get update && \
+          apt-get upgrade -y && \
+          apt-get install -y --no-install-recommends \
+              gcc \
+              libxslt1-dev \
+              libxml2-dev \
+              build-essential && \
+          apt-get clean && rm -rf /var/lib/apt/lists/*
+      ```
+    - Push the changes to the repository:
 
-Since the Dockerfile uses the raw `python: 3.12` as the base image, which is Debian-based, it inherits a large number of libraries. The library packages are not updated to the latest version. This increases the risk of attack surfaces because vulnerabilities can arise from unused and outdated Debian-based libraries that the app inherits when the image is built. As a consequence, if the vulnerability in the library is installed in the Docker image, it may be exploited by attackers even if the app is secure. These vulnerabilities don't come from the app, they come from the Debian layer. 
+      <img width="1897" height="902" alt="image" src="https://github.com/user-attachments/assets/562673c0-7df0-48cd-990c-f43580dcf63e" />
 
-The Trivy scanner would fail the security check upon scanning the Docker image because HIGH/CRITICAL-level vulnerabilities are found in the base layer:
+15. Add monitoring and logging
+    - Create a `prometheus.yml` file in the `app` directory to scrape log metrics from the Flask application.
+    - Create a `docker-compose.yml` file in the `app` directory for Docker to run services like Prometheus and Grafana, and build the Docker image from the Dockerfile in one go.
+    - Run the services using the following command:
+      ```
+      docker compose build
+      docker compose up
+      ```
+    - Visit Prometheus on the web browser: `http://localhost:9090`
+      - Add queries for the metrics Prometheus scrapes:
+        - Total add requests:
 
-<img width="1878" height="921" alt="image" src="https://github.com/user-attachments/assets/d0d12d34-374a-4d2d-9080-7bb78bd72b38" />
+          <img width="1905" height="302" alt="image" src="https://github.com/user-attachments/assets/325c20da-eef5-45b7-b8fb-17470abd047d" />
+        - Latency of added requests:
 
-<img width="1314" height="738" alt="image" src="https://github.com/user-attachments/assets/f200a2b8-5607-4233-9fd8-803cacc9912b" />
+          <img width="1909" height="760" alt="image" src="https://github.com/user-attachments/assets/ce9f9256-59a7-4bcb-bb69-2bf80e305049" />
+        - Total number of CSRF failures:
 
-<img width="1294" height="857" alt="image" src="https://github.com/user-attachments/assets/a082717f-4477-492a-890d-ef276b777440" />
+          <img width="1913" height="292" alt="image" src="https://github.com/user-attachments/assets/ea9548f6-3e01-4d16-872f-b673eaebdc6c" />
 
-<img width="1356" height="883" alt="image" src="https://github.com/user-attachments/assets/2eeb67b7-afcb-4e17-911f-624bad65a586" />
+    - To visualise the logs, visit Grafana: `http://localhost:3000`
+      - Go to "Data Sources" and choose Prometheus as the source.
+      - Use `http://prometheus:9090` as the Prometheus server URL.
+      - Go to "Dashboards" and create a new dashboard.
+      - Create graphs for CSRF failures, total add requests, and the latency of add requests in this dashboard:
 
-These Trivy scanning reports above show that failures are due to a lot of outdated and unused libraries inherited from the Debian-based `python: 3.12` base image. To fix these vulnerabilities, the best course of action is to update the system packages to the latest patched versions and remove any extra packages that may contain these security risks. By having up-to-date packages and fewer unnecessary packages, this reduces the attack surfaces and lowers the vulnerabilities. This can be achieved by adding the following to the Dockerfile:
-
-```
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        libxslt1-dev \
-        libxml2-dev \
-        build-essential && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-```
-
-Whenever the image is being built, the packages in the Debian layer will consistently update to the latest version while also preventing the installation of unnecessary packages and removing them if they are present. This ensures that a smaller, more secure image is less likely to fail a vulnerability scan:
-
-<img width="1897" height="902" alt="image" src="https://github.com/user-attachments/assets/562673c0-7df0-48cd-990c-f43580dcf63e" />
-
-As shown above, the Trivy scanner was able the pass the security checks for the Docker image before being pushed to the Artifact Registry and deployed to Cloud Run.
-
-### Add Monitoring and Logging
-
-This step involves integrating logging into the Flask application so that activities are recorded and monitored. To do this, you will need to integrate Prometheus into the Flask application to monitor numerical metrics such as the number of CSRF failures, the number of added to-do list item requests, and the latency of added requests so that they can be visualised in Grafana, and Google Cloud Logging for centralised logging, so that it collects logs in one place, which are filtered through severity levels such as `INFO`, `WARNING`, and `ERROR`. 
-
-You will also need to create a `prometheus.yml` file in the `app` directory so that Prometheus can scrape logs from the Flask application. 
-
-You will also need to create a `docker-compose.yml` file, which should also be in the `app` directory. The purpose of this file is for Docker to run services within the same network in one go, such as building the image of the Flask application from the Dockerfile, running Prometheus to scrape metrics from the Flask application, and running Grafana to visualise those numerical metrics. This file ensures that all the services and networks that make up the entire application stack are set up by a single command instead of manually starting each container one by one, allowing the services within the same virtual network to communicate with one another.
-
-To set up these services and run them, you will need to run the following commands:
-```
-docker compose build
-docker compose up
-```
-
-If you need to make any changes to the `docker-compose.yml` file and any other files, you will need to stop the services by pressing `Ctrl+C` on your keyboard and running the following command to stop and remove containers, networks, images, and volumes:
-```
-docker compose down
-```
-
-Every time you make changes, you can run the `docker compose build` and `docker compose up` commands again to run the respective services. 
-
-Once these services are running, you can visit Prometheus on the web browser using the following URL: `http://localhost:9090`
-
-Once you are in this page, you can add queries for the metrics Prometheus scrapes, for example:
-- Total add requests:
-
-  <img width="1905" height="302" alt="image" src="https://github.com/user-attachments/assets/325c20da-eef5-45b7-b8fb-17470abd047d" />
-
-- Latency of added requests:
-
-  <img width="1909" height="760" alt="image" src="https://github.com/user-attachments/assets/ce9f9256-59a7-4bcb-bb69-2bf80e305049" />
-
-- Total number of CSRF failures:
-
-  <img width="1913" height="292" alt="image" src="https://github.com/user-attachments/assets/ea9548f6-3e01-4d16-872f-b673eaebdc6c" />
-
-As shown above, Prometheus is successfully scraping metrics from the Flask application.
-
-To visualise these logs, you can visit Grafana using the following URL: `http://localhost:3000`
-
-Once you are on this page, go to "Data sources" and choose Prometheus as the source. For the Prometheus server URL, use the following URL and click "Save & test": `http://prometheus:9090`
-
-Next, go to Dashboards and create a new dashboard. Create graphs for CSRF failures, total add requests, and the latency of add requests in this dashboard:
-
-<img width="1621" height="799" alt="image" src="https://github.com/user-attachments/assets/89fc5562-65fb-4deb-ab22-b9a8988feb5b" />
-
-
-
-
+        <img width="1621" height="799" alt="image" src="https://github.com/user-attachments/assets/89fc5562-65fb-4deb-ab22-b9a8988feb5b" />
+    - To end Prometheus and Grafana services, press `Ctrl+C`.
+    - To stop and remove containers, networks, images, and volumes, run the following command:
+      ```
+      docker compose down
+      ```
 
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
