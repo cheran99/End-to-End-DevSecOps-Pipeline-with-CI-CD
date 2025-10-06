@@ -373,6 +373,44 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
       docker compose down
       ```
 
+    - To view logs in Cloud Logging, go to "Monitoring" and then to "Logs Explorer" in the GCP portal:
+      - Run the queries for the following:
+        - Successful application start:
+          ```
+          severity="INFO"
+          textPayload: "App started successfully"
+          ```
+
+          <img width="1861" height="557" alt="image" src="https://github.com/user-attachments/assets/3b1abf98-1861-42fd-b403-afda7564583b" />
+
+        - CSRF failures:
+          ```
+          severity: "WARNING"
+          textPayload: "CSRF failure: "
+          ```
+
+          <img width="1825" height="769" alt="image" src="https://github.com/user-attachments/assets/5bafef3e-207f-4a91-bc72-18b4bf2de3a4" />
+
+        - Added requests:
+          ```
+          severity: "INFO"
+          textPayload: "Task added: "
+          ```
+
+          <img width="1834" height="606" alt="image" src="https://github.com/user-attachments/assets/96913d92-6375-4970-a8b7-696de6122ce1" />
+
+        - Completed requests:
+          ```
+          severity: "INFO"
+          textPayload: "Task completed: "
+          ```
+
+          <img width="1859" height="741" alt="image" src="https://github.com/user-attachments/assets/d6ddbd66-7014-48f7-8fa4-f21bafe18852" />
+
+
+
+
+
 ## References
 - https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
 - https://www.microsoft.com/en-gb/security/business/security-101/what-is-devsecops#:~:text=DevSecOps%2C%20which%20stands%20for%20development,releasing%20code%20with%20security%20vulnerabilities.
