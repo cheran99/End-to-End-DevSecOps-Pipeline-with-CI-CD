@@ -8,13 +8,19 @@ The most common tactic attackers use to access an organisation's data and assets
 
 This project highlights the integration of the end-to-end DevSecOps pipeline that automates frequent security checks, infrastructure provisioning, application deployment, and enforces security by design at every stage of the SDLC.
 
-## 🎯 Objectives
+### 🎯 Objectives
 1. Utilise GitHub Actions to automate the build, test, scan, and deployment of a containerised application.
 2. Integrate security tools early in the pipeline, such as Trivy (vulnerability scanning) and Bandit (static analysis). 
 3. Provision infrastructure on Google Cloud Platform (GCP) using Terraform.
 4. Use Docker to build and securely package the app with minimal, hardened images.
 5. Enable continuous deployment on Google Cloud Run or GKE.
 6. Showcase practical DevOps, DevSecOps, and cloud security skills.
+
+## ✅ Live Demo
+
+### Application Deployment to Cloud Run With CI/CD Workflow
+
+
 
 ## 📦 Project Structure
 ```
