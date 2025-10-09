@@ -20,7 +20,8 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 
 ### Application Deployment to Cloud Run With CI/CD Workflow
 
-
+Watch the full DevSecOps pipeline in action 👇  
+[![Watch the video](https://img.youtube.com/vi/DoN55ZBEqRA/0.jpg)](https://youtu.be/DoN55ZBEqRA)
 
 ## 📦 Project Structure
 ```
