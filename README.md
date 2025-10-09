@@ -23,6 +23,10 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 Watch the full DevSecOps pipeline in action 👇  
 [![Watch the video](https://img.youtube.com/vi/DoN55ZBEqRA/0.jpg)](https://youtu.be/DoN55ZBEqRA)
 
+### A To-Do List Flask Application Running On Cloud Run
+
+https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
+
 ## 📦 Project Structure
 ```
 /
@@ -217,7 +221,6 @@ Watch the full DevSecOps pipeline in action 👇
      ```
      <img width="1919" height="700" alt="image" src="https://github.com/user-attachments/assets/1d068801-9862-4ba5-8719-c3d87683b443" />
 
-     https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
 
 7. Build a CI/CD pipeline using GitHub Actions to automate deployment to Cloud Run
    - Create a GitHub Actions service account on Terraform with the following permissions:
