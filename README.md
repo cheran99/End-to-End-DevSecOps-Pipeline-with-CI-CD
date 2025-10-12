@@ -16,6 +16,10 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 5. Enable continuous deployment on Google Cloud Run or GKE.
 6. Showcase practical DevOps, DevSecOps, and cloud security skills.
 
+## 🏗️ System Architecture
+
+<img width="2171" height="1021" alt="CloudRunDeployment" src="https://github.com/user-attachments/assets/6a2d8aed-7bcc-43b0-80cd-587fb187d2c5" />
+
 ## ✅ Live Demo
 
 ### Application Deployment to Cloud Run With CI/CD Workflow
