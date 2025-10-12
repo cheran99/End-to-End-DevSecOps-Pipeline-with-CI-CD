@@ -16,20 +16,68 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 5. Enable continuous deployment on Google Cloud Run or GKE.
 6. Showcase practical DevOps, DevSecOps, and cloud security skills.
 
+## 🚀 Features
+
+| Category | Feature | Description |
+|-----------|----------|--------------|
+| **🔧 CI/CD Integration** | **Automated Build & Deployment** | Complete GitHub Actions workflow for building, testing, scanning, and deploying applications. |
+| **🧪 Code Quality & Testing** | **Flake8 & Pytest Integration** | Linting and unit testing run automatically on every commit to maintain clean, reliable code. |
+| **🛡️ Security Integration (DevSecOps)** | **Bandit & Trivy Scanning** | Static and container vulnerability scans embedded in the pipeline for shift-left security. |
+| **☁️ Cloud Infrastructure (IaC)** | **Terraform Provisioning** | Automated creation of GCP resources using Infrastructure-as-Code. |
+| **🔐 Identity & Access Management (IAM)** | **Role-Based Access Control** | Implements least-privilege service accounts with secure permissions and access policies. |
+| **🧱 Containerisation** | **Dockerised Application Build** | Application is packaged into Docker images and stored securely in Artifact Registry. |
+| **📊 Monitoring & Observability** | **Grafana & Cloud Monitoring Dashboards** | Provides real-time visibility into application performance. |
+| **📜 Logging & Metrics** | **Cloud Logging & Prometheus**  | Tracks app-level metrics and logs to monitor CSRF failures, request counts, and latency. |
+| **🔒 Secrets Management** | **Secure Storage via Secret Manager** | Credentials and keys securely stored via  GCP Secret Manager. |
+
 ## 🏗️ System Architecture
 
 <img width="2171" height="1021" alt="CloudRunDeployment" src="https://github.com/user-attachments/assets/6a2d8aed-7bcc-43b0-80cd-587fb187d2c5" />
 
-## ✅ Live Demo
+## 📊 Monitoring Dashboards
+
+This project integrates **Grafana**, **Google Cloud Monitoring**, **Cloud Logging**, and **Prometheus** to track application-level performance.
+
+### Grafana Dashboards
+
+<img width="1624" height="738" alt="image" src="https://github.com/user-attachments/assets/4e6d20f0-3d92-4659-92b3-bc642d33e4b9" />
+
+<img width="1619" height="720" alt="image" src="https://github.com/user-attachments/assets/d61a9537-058f-481a-a1e0-8f39f90c45a1" />
+
+
+### Google Cloud Monitoring
+
+#### Successful App Start
+
+<img width="1547" height="276" alt="image" src="https://github.com/user-attachments/assets/a4a5928e-b22c-437b-96d6-19f8c10f9c2f" />
+
+#### CSRF Failures
+
+<img width="1544" height="474" alt="image" src="https://github.com/user-attachments/assets/c33dcf37-cd05-4ab1-96b8-2f140af616ad" />
+
+#### Added Requests
+
+<img width="1545" height="454" alt="image" src="https://github.com/user-attachments/assets/498585c2-e082-4efa-a2ca-01140c98e857" />
+
+#### Completed Requests
+
+<img width="1546" height="454" alt="image" src="https://github.com/user-attachments/assets/da59780e-e0a5-45cd-80ee-cc37cc5e77d2" />
+
+
+
+## ✅ Demo
 
 ### Application Deployment to Cloud Run With CI/CD Workflow
 
 Watch the full DevSecOps pipeline in action 👇  
+
 [![Watch the video](https://img.youtube.com/vi/DoN55ZBEqRA/0.jpg)](https://youtu.be/DoN55ZBEqRA)
 
 ### A To-Do List Flask Application Running On Cloud Run
 
-https://github.com/user-attachments/assets/58434e8d-1431-4599-9270-6a0bb43e1463
+Watch the full walkthrough below 👇 
+
+[![Watch the video](https://img.youtube.com/vi/P-dU1NkkVGQ/0.jpg)](https://youtu.be/P-dU1NkkVGQ)
 
 ## 📦 Project Structure
 ```
