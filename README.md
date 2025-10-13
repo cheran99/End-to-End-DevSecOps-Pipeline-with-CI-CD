@@ -4,7 +4,7 @@
 
 At every stage of the software development lifecycle, security must be embedded to detect and prevent vulnerabilities early. In high-risk sectors, such as finance, breaches can compromise sensitive data, incur regulatory penalties, and damage a company's reputation.
 
-This project demonstrates an end-to-end CI/CD pipeline that addresses these challenges by automating security checks, application deployment, and continuous monitoring, with security by design integrated at every stage of the SDLC. Docker images are built following security best practices, keeping packages up-to-date and minimising the attack surface.
+This project demonstrates an end-to-end CI/CD pipeline that addresses these challenges by automating security checks and application deployment, with security by design integrated at every stage of the SDLC. Docker images are built following security best practices, keeping packages up-to-date and minimising the attack surface. The project also demonstrates application observability with dashboards that track Flask app activity, helping developers understand performance and security behaviour.
 
 The pipeline shows how organisations can deliver secure, compliant, and production-ready applications while reducing operational risk, using a simple to-do list app as a case study.
 
