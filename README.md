@@ -28,7 +28,7 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 | **🧱 Containerisation** | **Dockerised Application Build** | Application is packaged into Docker images and stored securely in Artifact Registry. |
 | **📊 Monitoring & Observability** | **Grafana & Cloud Monitoring Dashboards** | Provides real-time visibility into application performance. |
 | **📜 Logging & Metrics** | **Cloud Logging & Prometheus**  | Tracks app-level metrics and logs to monitor CSRF failures, request counts, and latency. |
-| **🔒 Secrets Management** | **Secure Storage via Secret Manager** | Credentials and keys securely stored via  GCP Secret Manager. |
+| **🔒 Secrets Management** | **Secure Information via Secret Manager** | Credentials and keys securely stored via  GCP Secret Manager. |
 
 ## 🏗️ System Architecture
 
