@@ -2,11 +2,11 @@
 
 ## 🧐 Overview
 
-At every phase of the software development lifecycle (SDLC), advanced security needs to be implemented through continuous integration and continuous delivery (CI/CD) pipelines to ensure that the risk of releasing code with vulnerabilities is detected and minimised early before production rather than leaving it at the end where the issues are more diffciult and costly to resolve. 
+At every stage of the software development lifecycle, security must be embedded to detect and prevent vulnerabilities early. In high-risk sectors, such as finance, breaches can compromise sensitive data, incur regulatory penalties, and damage a company's reputation.
 
-The most common tactic attackers use to access an organisation's data and assets is exploiting software vulnerabilities. As a consequence of this, steps taken to fix the breaches are costly and time-consuming, affecting the company's reputation in the process. This is why implementing an end-to-end DevSecOps pipeline with CI/CD is important because it minimises the risk of deploying software with vulnerabilities and misconfigured infrastructure that attackers may exploit. 
+This project demonstrates an end-to-end CI/CD pipeline that addresses these challenges by automating security checks, application deployment, and continuous monitoring, with security by design integrated at every stage of the SDLC. Docker images are built following security best practices, keeping packages up-to-date and minimising the attack surface.
 
-This project highlights the integration of the end-to-end DevSecOps pipeline that automates frequent security checks, infrastructure provisioning, application deployment, and enforces security by design at every stage of the SDLC.
+The pipeline shows how organisations can deliver secure, compliant, and production-ready applications while reducing operational risk, using a simple to-do list app as a case study.
 
 ### 🎯 Objectives
 1. Utilise GitHub Actions to automate the build, test, scan, and deployment of a containerised application.
@@ -25,7 +25,7 @@ This project highlights the integration of the end-to-end DevSecOps pipeline tha
 | **🛡️ Security Integration (DevSecOps)** | **Bandit & Trivy Scanning** | Static and container vulnerability scans embedded in the pipeline for shift-left security. |
 | **☁️ Cloud Infrastructure (IaC)** | **Terraform Provisioning** | Automated creation of GCP resources using Infrastructure-as-Code. |
 | **🔐 Identity & Access Management (IAM)** | **Role-Based Access Control** | Implements least-privilege service accounts with secure permissions and access policies. |
-| **🧱 Containerisation** | **Dockerised Application Build** | Application is packaged into Docker images and stored securely in Artifact Registry. |
+| **🧱 Containerisation** | **Dockerised Application Build** | Application is packaged into Docker images with security best practices: packages are kept up-to-date, unnecessary packages are avoided, and images are stored securely in Artifact Registry. |
 | **📊 Monitoring & Observability** | **Grafana & Cloud Monitoring Dashboards** | Provides real-time visibility into application performance. |
 | **📜 Logging & Metrics** | **Cloud Logging & Prometheus**  | Tracks app-level metrics and logs to monitor CSRF failures, request counts, and latency. |
 | **🔒 Secrets Management** | **Secure Information via Secret Manager** | Credentials and keys securely stored via  GCP Secret Manager. |
