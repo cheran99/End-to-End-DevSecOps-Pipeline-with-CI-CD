@@ -473,102 +473,68 @@ Watch the full walkthrough below 👇
 
 
 
-## References
-- https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.
-- https://www.microsoft.com/en-gb/security/business/security-101/what-is-devsecops#:~:text=DevSecOps%2C%20which%20stands%20for%20development,releasing%20code%20with%20security%20vulnerabilities.
-- https://cloud.google.com/compute/docs/regions-zones#choosing_a_region_and_zone
-- https://jozimarback.medium.com/using-github-actions-with-terraform-on-gcp-d473a37ddbd6
-- https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-build
-- https://registry.terraform.io/providers/hashicorp/google/latest/docs
-- https://cloud.google.com/run/docs/authenticating/public#terraform
-- https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-variables
-- https://spacelift.io/blog/how-to-use-terraform-variables
-- https://www.geeksforgeeks.org/how-to-use-a-dockerignore-file/
-- https://cloud.google.com/sql/docs/mysql/create-instance
-- https://cloud.google.com/sql/pricing?hl=en#section-1
-- https://cloud.google.com/sql/docs/mysql/machine-series-overview
-- https://developer.hashicorp.com/terraform/language/resources/ephemeral/write-only
-- https://medium.com/terraform-using-google-cloud-platform/terraform-for-gcp-how-to-create-cloud-sql-0a558840914c
-- https://cloud.google.com/composer/docs/composer-3/set-environment-variables?_gl=1*13sj2ie*_ga*OTk3ODk5MTE5LjE3NTAwNzU4NDU.*_ga_WH2QY8WWF5*czE3NTEyMjM5OTgkbzExJGcxJHQxNzUxMjI4NTI3JGo2MCRsMCRoMA..#terraform
-- https://cloud.google.com/composer/docs/composer-3/terraform-create-environments
-- https://cloud.google.com/blog/topics/developers-practitioners/how-connect-cloud-sql-using-python-easy-way
-- https://cloud.google.com/sql/docs/mysql/samples/cloud-sql-mysql-sqlalchemy-connect-connector
-- https://cloud.google.com/sql/docs/mysql/connect-run
-- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/README.md
-- https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9
-- https://medium.com/@terwaljoop/just-a-devsecops-project-to-showcase-your-skills-and-knowledge-on-your-cv-and-github-60610005b097
-- https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#gcloud
-- https://cloud.google.com/secret-manager/docs/reference/libraries#client-libraries-install-python
-- https://www.digitalocean.com/community/tutorials/how-to-use-flask-sqlalchemy-to-interact-with-databases-in-a-flask-application
-- https://cloud.google.com/secret-manager/docs/view-secret-version
-- https://cloud.google.com/secret-manager/docs/access-secret-version
-- https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords
-- https://pypi.org/project/cloud-sql-python-connector/
-- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/app.py
-- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/connect_connector.py
-- https://medium.com/@pythoncodelab/building-a-to-do-list-app-in-python-a-step-by-step-guide-ce34b9ea141a
-- https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords
-- https://www.geeksforgeeks.org/python/todo-list-app-using-flask-python/
-- https://colab.research.google.com/github/GoogleCloudPlatform/cloud-sql-python-connector/blob/main/samples/notebooks/postgres_python_connector.ipynb#scrollTo=yjAPpIDdRfu2
-- https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9
-- https://stackoverflow.com/questions/73493052/how-to-connect-to-cloud-sql-using-python
-- https://sibabalwesinyaniso.medium.com/connecting-to-a-database-and-creating-tables-using-sqlalchemy-core-52cb79e51ca4
-- https://www.w3schools.com/sql/sql_update.asp
-- https://docs.sqlalchemy.org/en/20/core/engines.html
-- https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Table
-- https://docs.sqlalchemy.org/en/20/core/dml.html
-- https://docs.sqlalchemy.org/en/20/core/connections.html#using-transactions
-- https://docs.docker.com/guides/python/develop/
-- https://www.geeksforgeeks.org/cloud-computing/what-is-dockerfile/
-- https://docs.docker.com/get-started/docker-concepts/building-images/writing-a-dockerfile/
-- https://dev.to/prodevopsguytech/writing-a-dockerfile-beginners-to-advanced-31ie
-- https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/Dockerfile
-- https://www.w3schools.com/python/python_virtualenv.asp
-- https://docs.docker.com/get-started/docker-concepts/building-images/build-tag-and-publish-an-image/#build-an-image
-- https://cloud.google.com/artifact-registry/docs/docker/authentication
-- https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling
-- https://medium.com/@prayag-sangode/create-a-docker-gcp-artifactory-registry-c271a467e574
-- https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam
-- https://developer.hashicorp.com/terraform/language/meta-arguments/for_each
-- https://cloud.google.com/iam/docs/roles-overview
-- https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-gcloud
-- https://medium.com/@pathirage/step-in-to-ci-cd-a-hands-on-guide-to-building-ci-cd-pipeline-with-github-actions-7490d6f7d8ff
-- https://docs.github.com/en/actions/tutorials/build-and-test-code/python
-- https://cloud.google.com/blog/products/devops-sre/using-github-actions-with-google-cloud-deploy
-- https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions/
-- https://medium.com/google-cloud/create-a-ci-cd-pipeline-using-github-actions-and-google-cloud-9be20ff50e97
-- https://faun.pub/publishing-your-image-to-google-cloud-artifact-8ba7675ca594
-- https://discuss.google.dev/t/permission-artifactregistry-repositories-uploadartifacts-denied-on-resource-projects-xxx/107225/2
-- https://github.com/pulumi/pulumi-cloud-requests/issues/349
-- https://trivy.dev/v0.53/ecosystem/cicd/
-- https://medium.com/%40fanjum524/office-hours-integrating-trivy-in-github-actions-ci-for-end-to-end-repository-security-devsecops-e7aa640eca51
-- https://github.com/PyCQA/bandit-action/tree/main
-- https://bandit.readthedocs.io/en/latest/ci-cd/github-actions.html
-- https://www.jit.io/resources/appsec-tools/when-and-how-to-use-trivy-to-scan-containers-for-vulnerabilities
-- https://dev.to/luzkalidgm/how-to-use-bandit-as-a-sast-tool-for-your-python-app-1b0e
-- https://github.com/aquasecurity/trivy-action
-- https://bandit.readthedocs.io/en/latest/plugins/b104_hardcoded_bind_all_interfaces.html
-- https://cwe.mitre.org/data/definitions/605.html
-- https://nvd.nist.gov/vuln/detail/CVE-2018-1281
-- https://calmcode.io/course/bandit/nosec
-- https://naodeng.medium.com/pytest-tutorial-advance-usage-integration-ci-cd-and-github-action-c627c7cbbc22
-- https://cwe.mitre.org/data/definitions/703.html
-- https://realpython.com/pytest-python-testing/
-- https://flake8.pycqa.org/en/latest/
-- https://medium.com/python-pandemonium/what-is-flake8-and-why-we-should-use-it-b89bd78073f2
-- https://luis-sena.medium.com/creating-the-perfect-python-dockerfile-51bdec41f1c8
-- https://docs.docker.com/build/building/best-practices/#run
-- https://www.geeksforgeeks.org/python/csrf-protection-in-flask/
-- https://flask-wtf.readthedocs.io/en/0.15.x/csrf/
-- https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
-- https://flask.palletsprojects.com/en/stable/config/
-- https://www.geeksforgeeks.org/python/flask-security-with-talisman/
-- https://cloud.google.com/logging/docs/setup/python
-- https://prometheus.github.io/client_python/
-- https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/import-dashboards/
-- https://www.geeksforgeeks.org/cloud-computing/google-cloud-monitoring-google-cloud-logging/
-- https://medium.com/@fenari.kostem/monitoring-your-web-app-with-prometheus-and-grafana-a-step-by-step-guide-8286dae606c7
-- https://betterstack.com/community/guides/monitoring/prometheus-python-metrics/
-- https://grafana.com/docs/grafana-cloud/monitor-applications/asserts/enable-prom-metrics-collection/application-frameworks/flask/
-- https://github.com/SigNoz/opentelemetry-collector-prometheus-receiver-example
-- https://www.youtube.com/watch?v=moLWjeXoVso
+## 📚 References
+
+- [CI/CD Security & DevSecOps - SquareOps](https://squareops.com/ci-cd-security-devsecops/#:~:text=Why%20SquareOps%20is%20the%20Right,security%20for%20your%20software%20delivery.)
+- [What is DevSecOps - Microsoft](https://www.microsoft.com/en-gb/security/business/security-101/what-is-devsecops#:~:text=DevSecOps%2C%20which%20stands%20for%20development,releasing%20code%20with%20security%20vulnerabilities.)
+- [Choosing a GCP Region & Zone](https://cloud.google.com/compute/docs/regions-zones#choosing_a_region_and_zone)
+- [GitHub Actions with Terraform on GCP - Medium](https://jozimarback.medium.com/using-github-actions-with-terraform-on-gcp-d473a37ddbd6)
+- [Terraform GCP Tutorial](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-build)
+- [Terraform Google Provider Docs](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+- [Cloud Run Authentication with Terraform](https://cloud.google.com/run/docs/authenticating/public#terraform)
+- [Terraform Variables Tutorial](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-variables)
+- [Using Terraform Variables - Spacelift](https://spacelift.io/blog/how-to-use-terraform-variables)
+- [Using .dockerignore File - GeeksforGeeks](https://www.geeksforgeeks.org/how-to-use-a-dockerignore-file/)
+- [Cloud SQL MySQL - Create Instance](https://cloud.google.com/sql/docs/mysql/create-instance)
+- [Cloud SQL Pricing](https://cloud.google.com/sql/pricing?hl=en#section-1)
+- [Cloud SQL Machine Series Overview](https://cloud.google.com/sql/docs/mysql/machine-series-overview)
+- [Terraform Ephemeral Resource Docs](https://developer.hashicorp.com/terraform/language/resources/ephemeral/write-only)
+- [Terraform Cloud SQL Tutorial - Medium](https://medium.com/terraform-using-google-cloud-platform/terraform-for-gcp-how-to-create-cloud-sql-0a558840914c)
+- [Set Environment Variables in Composer](https://cloud.google.com/composer/docs/composer-3/set-environment-variables?_gl=1*13sj2ie*_ga*OTk3ODk5MTE5LjE3NTAwNzU4NDU.*_ga_WH2QY8WWF5*czE3NTEyMjM5OTgkbzExJGcxJHQxNzUxMjI4NTI3JGo2MCRsMCRoMA..#terraform)
+- [Terraform Create Environments - Cloud Composer](https://cloud.google.com/composer/docs/composer-3/terraform-create-environments)
+- [Connecting Cloud SQL using Python](https://cloud.google.com/blog/topics/developers-practitioners/how-connect-cloud-sql-using-python-easy-way)
+- [Cloud SQL MySQL SQLAlchemy Connect Connector](https://cloud.google.com/sql/docs/mysql/samples/cloud-sql-mysql-sqlalchemy-connect-connector)
+- [Cloud SQL Connect from Cloud Run](https://cloud.google.com/sql/docs/mysql/connect-run)
+- [GoogleCloudPlatform Python Samples - Cloud SQL SQLAlchemy](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/README.md)
+- [Connect Python App to Cloud SQL - Medium](https://medium.com/@faizififita1/connect-your-python-app-to-google-cloud-sql-the-easy-way-7e459de2f4e9)
+- [DevSecOps Project Showcase - Medium](https://medium.com/@terwaljoop/just-a-devsecops-project-to-showcase-your-skills-and-knowledge-on-your-cv-and-github-60610005b097)
+- [GCP Secret Manager Docs](https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#gcloud)
+- [Secret Manager Client Libraries](https://cloud.google.com/secret-manager/docs/reference/libraries#client-libraries-install-python)
+- [Flask SQLAlchemy Tutorial - DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-flask-sqlalchemy-to-interact-with-databases-in-a-flask-application)
+- [View Secret Version - GCP](https://cloud.google.com/secret-manager/docs/view-secret-version)
+- [Access Secret Version - GCP](https://cloud.google.com/secret-manager/docs/access-secret-version)
+- [SQLAlchemy Escaping Special Characters](https://docs.sqlalchemy.org/en/14/core/engines.html#escaping-special-characters-such-as-signs-in-passwords)
+- [Cloud SQL Python Connector - PyPI](https://pypi.org/project/cloud-sql-python-connector/)
+- [Python Docs Samples App.py](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/app.py)
+- [Python Docs Samples Connect Connector](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/main/cloud-sql/mysql/sqlalchemy/connect_connector.py)
+- [Building a To-Do List App in Python - Medium](https://medium.com/@pythoncodelab/building-a-to-do-list-app-in-python-a-step-by-step-guide-ce34b9ea141a)
+- [Python Flask To-Do List - GeeksforGeeks](https://www.geeksforgeeks.org/python/todo-list-app-using-flask-python/)
+- [Postgres Python Connector Notebook](https://colab.research.google.com/github/GoogleCloudPlatform/cloud-sql-python-connector/blob/main/samples/notebooks/postgres_python_connector.ipynb#scrollTo=yjAPpIDdRfu2)
+- [StackOverflow: Cloud SQL Python Connection](https://stackoverflow.com/questions/73493052/how-to-connect-to-cloud-sql-using-python)
+- [SQLAlchemy Core & Tables Tutorial](https://sibabalwesinyaniso.medium.com/connecting-to-a-database-and-creating-tables-using-sqlalchemy-core-52cb79e51ca4)
+- [W3Schools SQL Update](https://www.w3schools.com/sql/sql_update.asp)
+- [SQLAlchemy Core 2.0 Docs](https://docs.sqlalchemy.org/en/20/core/engines.html)
+- [SQLAlchemy Metadata](https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Table)
+- [SQLAlchemy DML](https://docs.sqlalchemy.org/en/20/core/dml.html)
+- [SQLAlchemy Transactions](https://docs.sqlalchemy.org/en/20/core/connections.html#using-transactions)
+- [Python Docker Development Guide](https://docs.docker.com/guides/python/develop/)
+- [Dockerfile Basics - GeeksforGeeks](https://www.geeksforgeeks.org/cloud-computing/what-is-dockerfile/)
+- [Writing a Dockerfile - Docker Docs](https://docs.docker.com/get-started/docker-concepts/building-images/writing-a-dockerfile/)
+- [Dockerfile Best Practices - Dev.to](https://dev.to/prodevopsguytech/writing-a-dockerfile-beginners-to-advanced-31ie)
+- [Python Virtualenv - W3Schools](https://www.w3schools.com/python/python_virtualenv.asp)
+- [Docker Build & Push Image](https://docs.docker.com/get-started/docker-concepts/building-images/build-tag-and-publish-an-image/#build-an-image)
+- [Artifact Registry Docker Auth](https://cloud.google.com/artifact-registry/docs/docker/authentication)
+- [Artifact Registry Push & Pull](https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling)
+- [Terraform Secret IAM Docs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam)
+- [Terraform for_each Meta-Argument](https://developer.hashicorp.com/terraform/language/meta-arguments/for_each)
+- [GCP IAM Roles Overview](https://cloud.google.com/iam/docs/roles-overview)
+- [IAM Service Account Keys - GCP](https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-gcloud)
+- [CI/CD Pipeline Guide - Medium](https://medium.com/@pathirage/step-in-to-ci-cd-a-hands-on-guide-to-building-ci-cd-pipeline-with-github-actions-7490d6f7d8ff)
+- [GitHub Actions Python Tutorial](https://docs.github.com/en/actions/tutorials/build-and-test-code/python)
+- [Deploy to Cloud Run with GitHub Actions - GCP Blog](https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions/)
+- [Publishing Docker Images to Google Artifact Registry](https://faun.pub/publishing-your-image-to-google-cloud-artifact-8ba7675ca594)
+- [Trivy Documentation](https://trivy.dev/v0.53/ecosystem/cicd/)
+- [Bandit GitHub Action](https://github.com/PyCQA/bandit-action/tree/main)
+- [Prometheus Python Client](https://prometheus.github.io/client_python/)
+- [Grafana Dashboard Docs](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/import-dashboards/)
+- [YouTube Demo Video](https://www.youtube.com/watch?v=moLWjeXoVso)
